@@ -2,6 +2,7 @@ import { gql } from '@apollo/client'
 import { apolloClient } from '../gql/apolloClient'
 
 export class User {
+	id: string
 	name: string
 	email: string
 	description: string
@@ -9,30 +10,26 @@ export class User {
 	public static async fetchByName(name: User['name']): Promise<User | null> {
 		try {
 			interface GQLResponse {
-				GetUserByUsername: User
-			}
-
-			interface VariableTypes {
-				username: string
+				GetUserByName: User
 			}
 
 			const {
-				data: { GetUserByUsername }
-			} = await apolloClient.query<GQLResponse, VariableTypes>({
+				data: { GetUserByName }
+			} = await apolloClient.query<GQLResponse>({
 				query: gql`
-					{
-						GetUserByUsername(username: "${name}") {
-							name
-							email
-							description
+						{
+							GetUserByUsername(name: "${name}") {
+								name
+								email
+								description
+							}
 						}
-					}
-				`
+					`
 			})
 
-			return GetUserByUsername ?? null
+			return GetUserByName ?? null
 		} catch {
-			return null
+			throw new Error('Error contacting server')
 		}
 	}
 
@@ -40,5 +37,6 @@ export class User {
 		this.name = partial?.name ?? 'no_name'
 		this.email = partial?.name ?? 'no_email'
 		this.description = partial?.name ?? 'no_description'
+		this.id = partial?.id ?? '1'
 	}
 }

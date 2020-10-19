@@ -3,4 +3,5 @@ import { theme } from './theme'
 
 export const Header = styled.h1`
 	color: ${theme.text_primary};
+	padding: 15px 0;
 `

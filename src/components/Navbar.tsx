@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import Link from 'next/link'
 import { theme } from './ui/theme'
 
 const NavUI = styled.nav`
@@ -27,18 +26,16 @@ export const Navbar = () => {
 	return (
 		<NavUI>
 			<ul>
-				<li>
-					<Link href='/'>Feed</Link>
-				</li>
-				<li>Hello</li>
-				<li>Hello</li>
-				<li>Hello</li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
 			</ul>
 			<ul>
-				<li>Hello</li>
-				<li>Hello</li>
-				<li>Hello</li>
-				<li>Hello</li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
 			</ul>
 		</NavUI>
 	)

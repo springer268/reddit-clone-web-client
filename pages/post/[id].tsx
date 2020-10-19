@@ -1,22 +1,20 @@
 import { NextPage, NextPageContext } from 'next'
-import { User } from '../../src/entities'
-import { Layout, UserCard } from '../../src/components'
+import { Post } from '../../src/entities'
+import { Layout } from '../../src/components'
 import { Header, Wrapper } from '../../src/components/ui'
 
 interface InitialProps {
-	user: User | null
+	post: Post | null
 }
 
-const UserPage: NextPage<InitialProps> = ({ user }) => {
+const UserPage: NextPage<InitialProps> = ({ post }) => {
 	const MainContent: React.FC = () => {
-		return user ? (
-			<>
-				<UserCard />
-			</>
+		return post ? (
+			<Header>
+				{post.title}, {post.content}
+			</Header>
 		) : (
-			<>
-				<Header>No User found</Header>
-			</>
+			<Header>No Post found</Header>
 		)
 	}
 
@@ -30,10 +28,10 @@ const UserPage: NextPage<InitialProps> = ({ user }) => {
 }
 
 UserPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const name = ctx.query.name as string
-	const user = await User.fetchByName(name)
+	const id = ctx.query.id as string
+	const post = await Post.fetchByID(id)
 
-	return { user }
+	return { post }
 }
 
 export default UserPage

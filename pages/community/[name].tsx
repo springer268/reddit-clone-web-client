@@ -1,6 +1,7 @@
 import { NextPage, NextPageContext } from 'next'
 import { Community } from '../../src/entities'
 import { Layout } from '../../src/components'
+import { Wrapper } from '../../src/components/ui'
 
 interface InitialProps {
 	community: Community
@@ -9,7 +10,9 @@ interface InitialProps {
 const CommunityPage: NextPage<InitialProps> = ({ community }) => {
 	return (
 		<Layout>
-			<h1>{community.name}</h1>
+			<Wrapper>
+				<h1>{community.name}</h1>
+			</Wrapper>
 		</Layout>
 	)
 }
