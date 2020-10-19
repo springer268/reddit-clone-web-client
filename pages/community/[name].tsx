@@ -1,5 +1,5 @@
 import { NextPage, NextPageContext } from 'next'
-import { Community } from '../../src/entities'
+import { Community } from '../../src/models'
 import { Layout } from '../../src/components'
 import { Wrapper } from '../../src/components/ui'
 

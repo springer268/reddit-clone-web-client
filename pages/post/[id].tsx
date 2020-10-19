@@ -1,5 +1,5 @@
 import { NextPage, NextPageContext } from 'next'
-import { Post } from '../../src/entities'
+import { Post } from '../../src/models'
 import { Layout } from '../../src/components'
 import { Header, Wrapper } from '../../src/components/ui'
 

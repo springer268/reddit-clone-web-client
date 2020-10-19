@@ -1,15 +1,15 @@
 import { NextPage, NextPageContext } from 'next'
-import { Post } from '../src/entities'
+import { Post, User } from '../src/models'
 import { Layout, PostCard } from '../src/components'
 import { Wrapper, Header } from '../src/components/ui'
 
 interface InitialProps {
-	posts: Post[]
+	posts: Required<Post>[] | null
 }
 
 const Feed: NextPage<InitialProps> = ({ posts }) => {
 	const Posts: React.FC = () => {
-		const renderedPosts = posts.map(post => <PostCard key={post.id} post={post} />)
+		const renderedPosts = posts?.map(post => <PostCard key={post.id} post={post} />) ?? <p>No posts!</p>
 
 		return <>{renderedPosts}</>
 	}
@@ -25,9 +25,9 @@ const Feed: NextPage<InitialProps> = ({ posts }) => {
 }
 
 Feed.getInitialProps = async (_ctx: NextPageContext): Promise<InitialProps> => {
-	const posts = (await Promise.all([1, 2, 3].map(async i => await Post.fetchByID(i.toString())))) as Post[]
+	const user = await User.fetchByName('Nick', { posts: true })
 
-	return { posts }
+	return { posts: user?.posts ?? null }
 }
 
 export default Feed

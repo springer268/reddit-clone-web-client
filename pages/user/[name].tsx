@@ -1,5 +1,5 @@
 import { NextPage, NextPageContext } from 'next'
-import { User } from '../../src/entities'
+import { User } from '../../src/models'
 import { Layout, UserCard } from '../../src/components'
 import { Header, Wrapper } from '../../src/components/ui'
 

@@ -112,7 +112,7 @@ const Content = styled.p`
 // COMPONENT
 
 interface Props {
-	post: Post
+	post: Required<Post>
 }
 
 export const PostCard: React.FC<Props> = ({ post }) => {
@@ -125,7 +125,7 @@ export const PostCard: React.FC<Props> = ({ post }) => {
 							<FontAwesomeIcon icon={faArrowUp} />
 						</li>
 						<li>
-							{post.karma() >= 1000 ? `${Math.floor(post.karma() / 100) / 10}k` : post.karma.toString()}
+							{post.upvotes >= 1000 ? `${Math.floor(post.upvotes / 100) / 10}k` : post.upvotes.toString()}
 						</li>
 						<li>
 							<FontAwesomeIcon icon={faArrowDown} />
@@ -136,14 +136,14 @@ export const PostCard: React.FC<Props> = ({ post }) => {
 					<HeadInfo>
 						<li>
 							{' '}
-							<Link href={`/community/${post.communityName}`}>
-								<CommunityName>r/{post.communityName}</CommunityName>
+							<Link href={`/community/${post.community.name}`}>
+								<CommunityName>r/{post.community.name}</CommunityName>
 							</Link>
 						</li>
 						<li>
 							posted by{' '}
-							<Link href={`/user/${post.authorName}`}>
-								<a>u/{post.authorName}</a>
+							<Link href={`/user/${post.author.name}`}>
+								<a>u/{post.author?.name}</a>
 							</Link>
 						</li>
 						<li>{new Date().getHours().toString()}</li>
