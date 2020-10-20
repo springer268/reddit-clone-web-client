@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import styled from 'styled-components'
 import { theme } from './ui/theme'
 
@@ -11,7 +12,7 @@ const NavUI = styled.nav`
 	ul {
 		height: 100%;
 		display: flex;
-		padding: 0 20px 0 0;
+		padding: 0 0 0 40px;
 
 		li {
 			margin: auto;
@@ -26,14 +27,20 @@ export const Navbar = () => {
 	return (
 		<NavUI>
 			<ul>
-				<li></li>
+				<li>
+					<Link href='/'>Home</Link>
+				</li>
 				<li></li>
 				<li></li>
 				<li></li>
 			</ul>
 			<ul>
-				<li></li>
-				<li></li>
+				<li>
+					<Link href='/login'>Login</Link>
+				</li>
+				<li>
+					<Link href='/signup'>Signup</Link>
+				</li>
 				<li></li>
 				<li></li>
 			</ul>

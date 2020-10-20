@@ -1,11 +1,15 @@
 import { backendApolloClient } from '../apollo'
-import { getUserByName, getUserByNameWithPosts } from '../graphql'
+import { getUserByName, getUserByNameWithPosts, addUser, attemptLogin } from '../graphql'
 import {
 	User as IUser,
 	GetUserByNameQuery,
 	GetUserByNameQueryVariables,
 	GetUserByNameWithPostsQuery,
-	GetUserByNameWithPostsQueryVariables
+	GetUserByNameWithPostsQueryVariables,
+	AddUserMutation,
+	AddUserMutationVariables,
+	AttemptLoginMutation,
+	AttemptLoginMutationVariables
 } from '../generated'
 import { Post } from '.'
 
@@ -51,11 +55,35 @@ export class User {
 		}
 	}
 
+	static async attemptLogin(name: User['name'], password: string): Promise<User | null> {
+		try {
+			const { data } = await backendApolloClient.mutate<AttemptLoginMutation, AttemptLoginMutationVariables>({
+				mutation: attemptLogin,
+				variables: { name, password }
+			})
+
+			return data?.AttemptLogin ? new User(data.AttemptLogin as User) : null
+		} catch (error) {
+			throw error
+		}
+	}
+
+	static async createFromNameAndPassword(name: User['name'], password: string): Promise<void> {
+		try {
+			await backendApolloClient.mutate<AddUserMutation, AddUserMutationVariables>({
+				mutation: addUser,
+				variables: { name, password }
+			})
+		} catch (error) {
+			throw error
+		}
+	}
+
 	public constructor(partial?: Partial<User>) {
 		this.__typename = partial?.__typename ?? undefined
 		this.name = partial?.name ?? 'no_name'
-		this.email = partial?.name ?? 'no_email'
-		this.description = partial?.name ?? 'no_description'
+		this.email = partial?.email ?? 'no_email'
+		this.description = partial?.description ?? 'no_description'
 		this.id = partial?.id ?? '1'
 		this.posts = partial?.posts
 	}

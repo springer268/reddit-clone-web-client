@@ -74,10 +74,17 @@ export type Community = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  AttemptLogin: User;
   AddUser: User;
   AddPost: Post;
   DeletePostByID: Scalars['Boolean'];
   AddCommunityByName: Community;
+};
+
+
+export type MutationAttemptLoginArgs = {
+  password: Scalars['String'];
+  name: Scalars['String'];
 };
 
 
@@ -103,6 +110,34 @@ export type MutationDeletePostByIdArgs = {
 export type MutationAddCommunityByNameArgs = {
   name: Scalars['String'];
 };
+
+export type AddUserMutationVariables = Exact<{
+  name: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type AddUserMutation = (
+  { __typename?: 'Mutation' }
+  & { AddUser: (
+    { __typename?: 'User' }
+    & Pick<User, 'name'>
+  ) }
+);
+
+export type AttemptLoginMutationVariables = Exact<{
+  name: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type AttemptLoginMutation = (
+  { __typename?: 'Mutation' }
+  & { AttemptLogin: (
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'name' | 'email' | 'description'>
+  ) }
+);
 
 export type GetCommunityByNameQueryVariables = Exact<{
   name: Scalars['String'];
@@ -163,11 +198,87 @@ export type GetUserByNameWithPostsQuery = (
     & { posts: Array<(
       { __typename?: 'Post' }
       & Pick<Post, 'id' | 'title' | 'content' | 'upvotes' | 'downvotes'>
+      & { community: (
+        { __typename?: 'Community' }
+        & Pick<Community, 'id' | 'name' | 'followerCount'>
+      ), author: (
+        { __typename?: 'User' }
+        & Pick<User, 'name' | 'id' | 'email' | 'description'>
+      ) }
     )> }
   )> }
 );
 
 
+export const AddUserDocument = gql`
+    mutation AddUser($name: String!, $password: String!) {
+  AddUser(name: $name, password: $password) {
+    name
+  }
+}
+    `;
+export type AddUserMutationFn = Apollo.MutationFunction<AddUserMutation, AddUserMutationVariables>;
+
+/**
+ * __useAddUserMutation__
+ *
+ * To run a mutation, you first call `useAddUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addUserMutation, { data, loading, error }] = useAddUserMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useAddUserMutation(baseOptions?: Apollo.MutationHookOptions<AddUserMutation, AddUserMutationVariables>) {
+        return Apollo.useMutation<AddUserMutation, AddUserMutationVariables>(AddUserDocument, baseOptions);
+      }
+export type AddUserMutationHookResult = ReturnType<typeof useAddUserMutation>;
+export type AddUserMutationResult = Apollo.MutationResult<AddUserMutation>;
+export type AddUserMutationOptions = Apollo.BaseMutationOptions<AddUserMutation, AddUserMutationVariables>;
+export const AttemptLoginDocument = gql`
+    mutation AttemptLogin($name: String!, $password: String!) {
+  AttemptLogin(name: $name, password: $password) {
+    id
+    name
+    email
+    description
+  }
+}
+    `;
+export type AttemptLoginMutationFn = Apollo.MutationFunction<AttemptLoginMutation, AttemptLoginMutationVariables>;
+
+/**
+ * __useAttemptLoginMutation__
+ *
+ * To run a mutation, you first call `useAttemptLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAttemptLoginMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [attemptLoginMutation, { data, loading, error }] = useAttemptLoginMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useAttemptLoginMutation(baseOptions?: Apollo.MutationHookOptions<AttemptLoginMutation, AttemptLoginMutationVariables>) {
+        return Apollo.useMutation<AttemptLoginMutation, AttemptLoginMutationVariables>(AttemptLoginDocument, baseOptions);
+      }
+export type AttemptLoginMutationHookResult = ReturnType<typeof useAttemptLoginMutation>;
+export type AttemptLoginMutationResult = Apollo.MutationResult<AttemptLoginMutation>;
+export type AttemptLoginMutationOptions = Apollo.BaseMutationOptions<AttemptLoginMutation, AttemptLoginMutationVariables>;
 export const GetCommunityByNameDocument = gql`
     query GetCommunityByName($name: String!) {
   GetCommunityByName(name: $name) {
@@ -293,6 +404,17 @@ export const GetUserByNameWithPostsDocument = gql`
       content
       upvotes
       downvotes
+      community {
+        id
+        name
+        followerCount
+      }
+      author {
+        name
+        id
+        email
+        description
+      }
     }
   }
 }

@@ -1,13 +1,27 @@
-import { Card, Header, Wrapper } from './ui'
+import styled from 'styled-components'
+import { User } from 'models'
+import { Card, Header } from './ui'
 
-interface Props {}
+const Style = styled.div`
+	padding: 0 0 15px 0;
+	margin: 0 25px;
 
-export const UserCard: React.FC<Props> = _props => {
+	${Header} {
+		padding: 15px 0 5px 0;
+	}
+`
+
+interface Props {
+	user: User
+}
+
+export const UserCard: React.FC<Props> = ({ user }) => {
 	return (
 		<Card style={{ marginTop: '20px' }}>
-			<Wrapper>
-				<Header>Nick</Header>
-			</Wrapper>
+			<Style>
+				<Header>{user.name}</Header>
+				<p>{user.description}</p>
+			</Style>
 		</Card>
 	)
 }

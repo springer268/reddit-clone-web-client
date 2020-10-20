@@ -25,7 +25,7 @@ const Feed: NextPage<InitialProps> = ({ posts }) => {
 }
 
 Feed.getInitialProps = async (_ctx: NextPageContext): Promise<InitialProps> => {
-	const user = await User.fetchByName('Nick', { posts: true })
+	const user = await User.fetchByName('ZeroSevenTen', { posts: true })
 
 	return { posts: user?.posts ?? null }
 }

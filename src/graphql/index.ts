@@ -1,3 +1,5 @@
+export * from './addUser'
+export * from './attemptLogin'
 export * from './getCommunityByName'
 export * from './getPostByID'
 export * from './getUserByName'

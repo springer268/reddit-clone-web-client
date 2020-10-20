@@ -11,7 +11,7 @@ const UserPage: NextPage<InitialProps> = ({ user }) => {
 	const MainContent: React.FC = () => {
 		return user ? (
 			<>
-				<UserCard />
+				<UserCard user={user} />
 			</>
 		) : (
 			<>

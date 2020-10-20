@@ -8,6 +8,7 @@
 -   Apollo Client for GraphQL
 -   Styled Components
 -   Font Awesome Icons
+-   Formik 2
 
 ## Cool Stuff
 

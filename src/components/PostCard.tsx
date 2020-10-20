@@ -2,11 +2,16 @@ import Link from 'next/link'
 import styled from 'styled-components'
 import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Post } from 'entities'
+import { Post } from '../models'
 import { Card } from './ui'
 import { theme } from './ui/theme'
 
 // CSS
+
+const Grid = styled.div`
+	display: grid;
+	grid-template-columns: 1fr 11fr;
+`
 
 const KarmaArea = styled.div`
 	background: ${theme.bg_card_secondary};
@@ -118,53 +123,57 @@ interface Props {
 export const PostCard: React.FC<Props> = ({ post }) => {
 	return (
 		<Link href={`/post/${post.id}`}>
-			<Card>
-				<KarmaArea>
-					<ul>
-						<li>
-							<FontAwesomeIcon icon={faArrowUp} />
-						</li>
-						<li>
-							{post.upvotes >= 1000 ? `${Math.floor(post.upvotes / 100) / 10}k` : post.upvotes.toString()}
-						</li>
-						<li>
-							<FontAwesomeIcon icon={faArrowDown} />
-						</li>
-					</ul>
-				</KarmaArea>
-				<Body>
-					<HeadInfo>
-						<li>
-							{' '}
-							<Link href={`/community/${post.community.name}`}>
-								<CommunityName>r/{post.community.name}</CommunityName>
-							</Link>
-						</li>
-						<li>
-							posted by{' '}
-							<Link href={`/user/${post.author.name}`}>
-								<a>u/{post.author?.name}</a>
-							</Link>
-						</li>
-						<li>{new Date().getHours().toString()}</li>
-					</HeadInfo>
-					<Title>{post.title}</Title>
-					<Content>{post.content}</Content>
-					<FootInfo>
-						<SubtleItem>
-							<a href='#'>{2} Comments</a>
-						</SubtleItem>
-						<SubtleItem>
-							<a href='#'>Give Award</a>
-						</SubtleItem>
-						<SubtleItem>
-							<a href='#'>Share</a>
-						</SubtleItem>
-						<SubtleItem>
-							<a href='#'>More</a>
-						</SubtleItem>
-					</FootInfo>
-				</Body>
+			<Card hoverEffect>
+				<Grid>
+					<KarmaArea>
+						<ul>
+							<li>
+								<FontAwesomeIcon icon={faArrowUp} />
+							</li>
+							<li>
+								{post.upvotes >= 1000
+									? `${Math.floor(post.upvotes / 100) / 10}k`
+									: post.upvotes.toString()}
+							</li>
+							<li>
+								<FontAwesomeIcon icon={faArrowDown} />
+							</li>
+						</ul>
+					</KarmaArea>
+					<Body>
+						<HeadInfo>
+							<li>
+								{' '}
+								<Link href={`/community/${post.community.name}`}>
+									<CommunityName>r/{post.community.name}</CommunityName>
+								</Link>
+							</li>
+							<li>
+								posted by{' '}
+								<Link href={`/user/${post.author.name}`}>
+									<a>u/{post.author?.name}</a>
+								</Link>
+							</li>
+							<li>{new Date().getHours().toString()}</li>
+						</HeadInfo>
+						<Title>{post.title}</Title>
+						<Content>{post.content}</Content>
+						<FootInfo>
+							<SubtleItem>
+								<a href='#'>{2} Comments</a>
+							</SubtleItem>
+							<SubtleItem>
+								<a href='#'>Give Award</a>
+							</SubtleItem>
+							<SubtleItem>
+								<a href='#'>Share</a>
+							</SubtleItem>
+							<SubtleItem>
+								<a href='#'>More</a>
+							</SubtleItem>
+						</FootInfo>
+					</Body>
+				</Grid>
 			</Card>
 		</Link>
 	)
