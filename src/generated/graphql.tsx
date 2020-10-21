@@ -13,11 +13,18 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
-  getUserByID?: Maybe<User>;
+  GetSelf?: Maybe<User>;
+  GetUserByID?: Maybe<User>;
   GetUserByName?: Maybe<User>;
   GetPostByID?: Maybe<Post>;
   GetCommunityByID?: Maybe<Community>;
   GetCommunityByName?: Maybe<Community>;
+  GetPostsFromCommunityByID?: Maybe<Array<Post>>;
+};
+
+
+export type QueryGetSelfArgs = {
+  yeah: Scalars['String'];
 };
 
 
@@ -43,6 +50,11 @@ export type QueryGetCommunityByIdArgs = {
 
 export type QueryGetCommunityByNameArgs = {
   name: Scalars['String'];
+};
+
+
+export type QueryGetPostsFromCommunityByIdArgs = {
+  communityID: Scalars['String'];
 };
 
 export type User = {
@@ -111,6 +123,22 @@ export type MutationAddCommunityByNameArgs = {
   name: Scalars['String'];
 };
 
+export type AddPostMutationVariables = Exact<{
+  communityID: Scalars['String'];
+  authorID: Scalars['String'];
+  title: Scalars['String'];
+  content: Scalars['String'];
+}>;
+
+
+export type AddPostMutation = (
+  { __typename?: 'Mutation' }
+  & { AddPost: (
+    { __typename?: 'Post' }
+    & Pick<Post, 'id'>
+  ) }
+);
+
 export type AddUserMutationVariables = Exact<{
   name: Scalars['String'];
   password: Scalars['String'];
@@ -172,6 +200,50 @@ export type GetPostByIdQuery = (
   )> }
 );
 
+export type GetPostsFromCommunityByIdQueryVariables = Exact<{
+  communityID: Scalars['String'];
+}>;
+
+
+export type GetPostsFromCommunityByIdQuery = (
+  { __typename?: 'Query' }
+  & { GetPostsFromCommunityByID?: Maybe<Array<(
+    { __typename?: 'Post' }
+    & Pick<Post, 'id' | 'title' | 'content' | 'upvotes' | 'downvotes'>
+    & { author: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'name' | 'email' | 'description'>
+    ), community: (
+      { __typename?: 'Community' }
+      & Pick<Community, 'id' | 'name' | 'followerCount'>
+    ) }
+  )>> }
+);
+
+export type GetSelfQueryVariables = Exact<{
+  yeah: Scalars['String'];
+}>;
+
+
+export type GetSelfQuery = (
+  { __typename?: 'Query' }
+  & { GetSelf?: Maybe<(
+    { __typename?: 'User' }
+    & Pick<User, 'name' | 'id' | 'email' | 'description'>
+    & { posts: Array<(
+      { __typename?: 'Post' }
+      & Pick<Post, 'id' | 'title' | 'content' | 'upvotes' | 'downvotes'>
+      & { author: (
+        { __typename?: 'User' }
+        & Pick<User, 'name' | 'id' | 'email' | 'description'>
+      ), community: (
+        { __typename?: 'Community' }
+        & Pick<Community, 'id' | 'name' | 'followerCount'>
+      ) }
+    )> }
+  )> }
+);
+
 export type GetUserByNameQueryVariables = Exact<{
   name: Scalars['String'];
 }>;
@@ -210,6 +282,41 @@ export type GetUserByNameWithPostsQuery = (
 );
 
 
+export const AddPostDocument = gql`
+    mutation AddPost($communityID: String!, $authorID: String!, $title: String!, $content: String!) {
+  AddPost(communityID: $communityID, authorID: $authorID, title: $title, content: $content) {
+    id
+  }
+}
+    `;
+export type AddPostMutationFn = Apollo.MutationFunction<AddPostMutation, AddPostMutationVariables>;
+
+/**
+ * __useAddPostMutation__
+ *
+ * To run a mutation, you first call `useAddPostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddPostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addPostMutation, { data, loading, error }] = useAddPostMutation({
+ *   variables: {
+ *      communityID: // value for 'communityID'
+ *      authorID: // value for 'authorID'
+ *      title: // value for 'title'
+ *      content: // value for 'content'
+ *   },
+ * });
+ */
+export function useAddPostMutation(baseOptions?: Apollo.MutationHookOptions<AddPostMutation, AddPostMutationVariables>) {
+        return Apollo.useMutation<AddPostMutation, AddPostMutationVariables>(AddPostDocument, baseOptions);
+      }
+export type AddPostMutationHookResult = ReturnType<typeof useAddPostMutation>;
+export type AddPostMutationResult = Apollo.MutationResult<AddPostMutation>;
+export type AddPostMutationOptions = Apollo.BaseMutationOptions<AddPostMutation, AddPostMutationVariables>;
 export const AddUserDocument = gql`
     mutation AddUser($name: String!, $password: String!) {
   AddUser(name: $name, password: $password) {
@@ -357,6 +464,108 @@ export function useGetPostByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type GetPostByIdQueryHookResult = ReturnType<typeof useGetPostByIdQuery>;
 export type GetPostByIdLazyQueryHookResult = ReturnType<typeof useGetPostByIdLazyQuery>;
 export type GetPostByIdQueryResult = Apollo.QueryResult<GetPostByIdQuery, GetPostByIdQueryVariables>;
+export const GetPostsFromCommunityByIdDocument = gql`
+    query GetPostsFromCommunityByID($communityID: String!) {
+  GetPostsFromCommunityByID(communityID: $communityID) {
+    id
+    title
+    content
+    upvotes
+    downvotes
+    author {
+      id
+      name
+      email
+      description
+    }
+    community {
+      id
+      name
+      followerCount
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetPostsFromCommunityByIdQuery__
+ *
+ * To run a query within a React component, call `useGetPostsFromCommunityByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPostsFromCommunityByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPostsFromCommunityByIdQuery({
+ *   variables: {
+ *      communityID: // value for 'communityID'
+ *   },
+ * });
+ */
+export function useGetPostsFromCommunityByIdQuery(baseOptions?: Apollo.QueryHookOptions<GetPostsFromCommunityByIdQuery, GetPostsFromCommunityByIdQueryVariables>) {
+        return Apollo.useQuery<GetPostsFromCommunityByIdQuery, GetPostsFromCommunityByIdQueryVariables>(GetPostsFromCommunityByIdDocument, baseOptions);
+      }
+export function useGetPostsFromCommunityByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPostsFromCommunityByIdQuery, GetPostsFromCommunityByIdQueryVariables>) {
+          return Apollo.useLazyQuery<GetPostsFromCommunityByIdQuery, GetPostsFromCommunityByIdQueryVariables>(GetPostsFromCommunityByIdDocument, baseOptions);
+        }
+export type GetPostsFromCommunityByIdQueryHookResult = ReturnType<typeof useGetPostsFromCommunityByIdQuery>;
+export type GetPostsFromCommunityByIdLazyQueryHookResult = ReturnType<typeof useGetPostsFromCommunityByIdLazyQuery>;
+export type GetPostsFromCommunityByIdQueryResult = Apollo.QueryResult<GetPostsFromCommunityByIdQuery, GetPostsFromCommunityByIdQueryVariables>;
+export const GetSelfDocument = gql`
+    query GetSelf($yeah: String!) {
+  GetSelf(yeah: $yeah) {
+    name
+    id
+    email
+    description
+    posts {
+      id
+      title
+      content
+      upvotes
+      downvotes
+      author {
+        name
+        id
+        email
+        description
+      }
+      community {
+        id
+        name
+        followerCount
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetSelfQuery__
+ *
+ * To run a query within a React component, call `useGetSelfQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetSelfQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetSelfQuery({
+ *   variables: {
+ *      yeah: // value for 'yeah'
+ *   },
+ * });
+ */
+export function useGetSelfQuery(baseOptions?: Apollo.QueryHookOptions<GetSelfQuery, GetSelfQueryVariables>) {
+        return Apollo.useQuery<GetSelfQuery, GetSelfQueryVariables>(GetSelfDocument, baseOptions);
+      }
+export function useGetSelfLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSelfQuery, GetSelfQueryVariables>) {
+          return Apollo.useLazyQuery<GetSelfQuery, GetSelfQueryVariables>(GetSelfDocument, baseOptions);
+        }
+export type GetSelfQueryHookResult = ReturnType<typeof useGetSelfQuery>;
+export type GetSelfLazyQueryHookResult = ReturnType<typeof useGetSelfLazyQuery>;
+export type GetSelfQueryResult = Apollo.QueryResult<GetSelfQuery, GetSelfQueryVariables>;
 export const GetUserByNameDocument = gql`
     query GetUserByName($name: String!) {
   GetUserByName(name: $name) {

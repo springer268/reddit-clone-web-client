@@ -2,6 +2,7 @@ import Head from 'next/head'
 import { AppProps } from 'next/app'
 import { ApolloProvider } from '@apollo/client'
 import { createGlobalStyle } from 'styled-components'
+import { UserContextProvider } from '../src/context'
 import { backendApolloClient } from '../src/apollo'
 import { theme } from '../src/components/ui/theme'
 
@@ -28,11 +29,13 @@ const GlobalStyles = createGlobalStyle`
 export default function App({ Component, pageProps }: AppProps) {
 	return (
 		<ApolloProvider client={backendApolloClient}>
-			<Head>
-				<title>Reddit</title>
-			</Head>
-			<GlobalStyles />
-			<Component {...pageProps} />
+			<UserContextProvider>
+				<Head>
+					<title>Reddit</title>
+				</Head>
+				<GlobalStyles />
+				<Component {...pageProps} />
+			</UserContextProvider>
 		</ApolloProvider>
 	)
 }

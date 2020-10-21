@@ -1,6 +1,15 @@
 import { backendApolloClient } from '../apollo'
-import { getCommunityByName } from '../graphql'
-import { Community as ICommunity, GetCommunityByNameQuery, GetCommunityByNameQueryVariables } from '../generated'
+import { getCommunityByName, addPost, getPostsFromCommunityByID } from '../graphql'
+import {
+	Community as ICommunity,
+	GetCommunityByNameQuery,
+	GetCommunityByNameQueryVariables,
+	AddPostMutation,
+	AddPostMutationVariables,
+	GetPostsFromCommunityByIdQuery,
+	GetPostsFromCommunityByIdQueryVariables
+} from '../generated'
+import { User, Post } from '../models'
 
 export interface Community extends ICommunity {}
 export class Community {
@@ -14,6 +23,40 @@ export class Community {
 			)
 
 			return data.GetCommunityByName ? new Community(data.GetCommunityByName) : null
+		} catch (error) {
+			throw error
+		}
+	}
+
+	static async addPost(
+		title: Post['title'],
+		content: Post['content'],
+		authorID: User['id'],
+		communityID: Community['id']
+	): Promise<void> {
+		try {
+			await backendApolloClient.mutate<AddPostMutation, AddPostMutationVariables>({
+				mutation: addPost,
+				variables: { title, content, authorID, communityID }
+			})
+		} catch (error) {
+			throw error
+		}
+	}
+
+	static async getPostsByID(communityID: Community['id']): Promise<Post[] | null> {
+		try {
+			const { data } = await backendApolloClient.query<
+				GetPostsFromCommunityByIdQuery,
+				GetPostsFromCommunityByIdQueryVariables
+			>({
+				query: getPostsFromCommunityByID,
+				variables: { communityID }
+			})
+
+			return data?.GetPostsFromCommunityByID
+				? data.GetPostsFromCommunityByID.map(post => new Post(post as Post))
+				: null
 		} catch (error) {
 			throw error
 		}

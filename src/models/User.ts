@@ -1,19 +1,9 @@
 import { backendApolloClient } from '../apollo'
-import { getUserByName, getUserByNameWithPosts, addUser, attemptLogin } from '../graphql'
-import {
-	User as IUser,
-	GetUserByNameQuery,
-	GetUserByNameQueryVariables,
-	GetUserByNameWithPostsQuery,
-	GetUserByNameWithPostsQueryVariables,
-	AddUserMutation,
-	AddUserMutationVariables,
-	AttemptLoginMutation,
-	AttemptLoginMutationVariables
-} from '../generated'
+import { getUserByName, getUserByNameWithPosts, addUser, attemptLogin, getSelf } from '../graphql'
+import { User as IUser } from '../generated'
 import { Post } from '.'
 
-type CompleteUser = Omit<User, 'posts'> & { posts: Required<Post>[] }
+export type CompleteUser = Omit<User, 'posts'> & { posts: Required<Post>[] }
 
 export interface User extends Omit<IUser, 'posts'> {
 	posts?: Post[]
@@ -33,22 +23,19 @@ export class User {
 	): Promise<CompleteUser | User | null> {
 		try {
 			if (!options?.posts) {
-				const { data } = await backendApolloClient.query<GetUserByNameQuery, GetUserByNameQueryVariables>({
+				const { data } = await backendApolloClient.query({
 					query: getUserByName,
 					variables: { name }
 				})
 
 				return data.GetUserByName ? new User(data.GetUserByName) : null
 			} else {
-				const { data } = await backendApolloClient.query<
-					GetUserByNameWithPostsQuery,
-					GetUserByNameWithPostsQueryVariables
-				>({
+				const { data } = await backendApolloClient.query({
 					query: getUserByNameWithPosts,
 					variables: { name }
 				})
 
-				return data.GetUserByName ? (new User(data.GetUserByName as User) as CompleteUser) : null
+				return data?.GetUserByName ? (new User(data.GetUserByName as User) as CompleteUser) : null
 			}
 		} catch (error) {
 			throw error
@@ -57,12 +44,12 @@ export class User {
 
 	static async attemptLogin(name: User['name'], password: string): Promise<User | null> {
 		try {
-			const { data } = await backendApolloClient.mutate<AttemptLoginMutation, AttemptLoginMutationVariables>({
+			const { data } = await backendApolloClient.mutate({
 				mutation: attemptLogin,
 				variables: { name, password }
 			})
 
-			return data?.AttemptLogin ? new User(data.AttemptLogin as User) : null
+			return data?.AttemptLogin ? new User(data.AttemptLogin) : null
 		} catch (error) {
 			throw error
 		}
@@ -70,10 +57,23 @@ export class User {
 
 	static async createFromNameAndPassword(name: User['name'], password: string): Promise<void> {
 		try {
-			await backendApolloClient.mutate<AddUserMutation, AddUserMutationVariables>({
+			await backendApolloClient.mutate({
 				mutation: addUser,
 				variables: { name, password }
 			})
+		} catch (error) {
+			throw error
+		}
+	}
+
+	static async getSelf(): Promise<User | null> {
+		try {
+			const { data } = await backendApolloClient.query({
+				query: getSelf,
+				variables: { yeah: 'yeah' }
+			})
+
+			return data?.GetSelf ? new User(data.GetSelf) : null
 		} catch (error) {
 			throw error
 		}

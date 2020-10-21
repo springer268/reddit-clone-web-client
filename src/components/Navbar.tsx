@@ -1,3 +1,4 @@
+import { useUser } from 'hooks'
 import Link from 'next/link'
 import styled from 'styled-components'
 import { theme } from './ui/theme'
@@ -24,24 +25,40 @@ const NavUI = styled.nav`
 `
 
 export const Navbar = () => {
+	const { user, loading } = useUser()
+
 	return (
 		<NavUI>
 			<ul>
 				<li>
 					<Link href='/'>Home</Link>
 				</li>
-				<li></li>
+				<li>
+					<Link href='/profile'>Profile</Link>
+				</li>
 				<li></li>
 				<li></li>
 			</ul>
 			<ul>
 				<li>
-					<Link href='/login'>Login</Link>
+					<Link href='/createcommunity'>CreateCommunity</Link>
 				</li>
-				<li>
-					<Link href='/signup'>Signup</Link>
-				</li>
-				<li></li>
+				{!user && !loading ? (
+					<>
+						<li>
+							<Link href='/login'>Login</Link>
+						</li>
+						<li>
+							<Link href='/signup'>Signup</Link>
+						</li>
+					</>
+				) : (
+					<>
+						<li>
+							<Link href='/logout'>Logout</Link>
+						</li>
+					</>
+				)}
 				<li></li>
 			</ul>
 		</NavUI>

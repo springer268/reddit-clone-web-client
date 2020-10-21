@@ -1,10 +1,10 @@
 import { NextPage, NextPageContext } from 'next'
-import { User } from '../../src/models'
-import { Layout, UserCard } from '../../src/components'
+import { User, CompleteUser } from '../../src/models'
+import { Layout, UserCard, PostCard } from '../../src/components'
 import { Header, Wrapper } from '../../src/components/ui'
 
 interface InitialProps {
-	user: User | null
+	user: CompleteUser | null
 }
 
 const UserPage: NextPage<InitialProps> = ({ user }) => {
@@ -12,6 +12,9 @@ const UserPage: NextPage<InitialProps> = ({ user }) => {
 		return user ? (
 			<>
 				<UserCard user={user} />
+				{user.posts.map(post => (
+					<PostCard post={post} key={post.id} />
+				))}
 			</>
 		) : (
 			<>
@@ -31,7 +34,7 @@ const UserPage: NextPage<InitialProps> = ({ user }) => {
 
 UserPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
 	const name = ctx.query.name as string
-	const user = await User.fetchByName(name)
+	const user = await User.fetchByName(name, { posts: true })
 
 	return { user }
 }

@@ -1,33 +1,20 @@
-import { NextPage, NextPageContext } from 'next'
-import { Post, User } from '../src/models'
-import { Layout, PostCard } from '../src/components'
+import { useUser } from '../src/hooks'
+import { NextPage } from 'next'
+import { Layout } from '../src/components'
 import { Wrapper, Header } from '../src/components/ui'
 
-interface InitialProps {
-	posts: Required<Post>[] | null
-}
+interface InitialProps {}
 
-const Feed: NextPage<InitialProps> = ({ posts }) => {
-	const Posts: React.FC = () => {
-		const renderedPosts = posts?.map(post => <PostCard key={post.id} post={post} />) ?? <p>No posts!</p>
-
-		return <>{renderedPosts}</>
-	}
+const Feed: NextPage<InitialProps> = () => {
+	const { user } = useUser()
 
 	return (
 		<Layout>
 			<Wrapper>
-				<Header>Your Feed</Header>
-				<Posts />
+				<Header>{user?.name ?? 'You should login!'}</Header>
 			</Wrapper>
 		</Layout>
 	)
-}
-
-Feed.getInitialProps = async (_ctx: NextPageContext): Promise<InitialProps> => {
-	const user = await User.fetchByName('ZeroSevenTen', { posts: true })
-
-	return { posts: user?.posts ?? null }
 }
 
 export default Feed

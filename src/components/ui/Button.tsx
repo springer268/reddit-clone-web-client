@@ -1,19 +1,15 @@
 import styled from 'styled-components'
+import { theme } from './theme'
 
-const UI = styled.button`
-	padding: 5px 10px 5px 10px;
-	border-radius: 5px;
-	border: none;
+export const Button = styled.button`
+	margin-top: 5px;
+	font-size: 16px;
+	width: 100%;
+	height: 35px;
+	background: ${theme.gradients.purple};
 	outline: none;
+	color: #fff;
 	font-weight: 500;
-	text-transform: uppercase;
 	cursor: pointer;
-
-	&:hover {
-		transform: scale(1.03);
-	}
+	border: none;
 `
-
-export const Button: React.FC<{}> = ({ children }) => {
-	return <UI>{children}</UI>
-}
