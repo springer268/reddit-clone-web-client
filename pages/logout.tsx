@@ -1,9 +1,7 @@
 import { useEffect } from 'react'
-import { NextPage, NextPageContext } from 'next'
-import { Layout } from '../src/components'
-import { Header } from '../src/components/ui'
-import { getSelfQuery } from 'util/queries'
-import { ShallowUser } from 'models'
+import { NextPage } from 'next'
+import { Layout } from 'components'
+import { Header } from 'components/ui'
 import { useSelf } from 'hooks'
 
 interface InitialProps {}

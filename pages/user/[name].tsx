@@ -1,8 +1,8 @@
 import { NextPage, NextPageContext } from 'next'
-import { CompleteUser, ShallowUser } from 'models'
+import { CompleteUser } from 'models'
 import { Layout, PostCard } from 'components'
 import { Header } from 'components/ui'
-import { getSelfQuery, getUserByNameQuery } from 'util/queries'
+import { getUserByNameQuery } from 'util/queries'
 import { useIsAuth, useSelf } from 'hooks'
 
 interface InitialProps {

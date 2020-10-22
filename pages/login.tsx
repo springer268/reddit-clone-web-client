@@ -1,7 +1,5 @@
-import { NextPage, NextPageContext } from 'next'
-import { Layout, LoginCard } from '../src/components'
-import { getSelfQuery } from 'util/queries'
-import { ShallowUser } from 'models'
+import { NextPage } from 'next'
+import { Layout, LoginCard } from 'components'
 
 interface InitialProps {}
 

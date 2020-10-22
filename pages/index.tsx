@@ -1,9 +1,7 @@
 import { useIsAuth, useSelf } from 'hooks'
-import { ShallowUser } from 'models'
 import { NextPage, NextPageContext } from 'next'
-import { getSelfQuery } from 'util/queries'
-import { Layout } from '../src/components'
-import { Header } from '../src/components/ui'
+import { Layout } from 'components'
+import { Header } from 'components/ui'
 
 interface InitialProps {}
 

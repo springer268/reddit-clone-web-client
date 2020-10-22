@@ -1,6 +1,6 @@
-import { ShallowUser, TotalPost } from 'models'
+import { TotalPost } from 'models'
 import { NextPage, NextPageContext } from 'next'
-import { getPostByIDQuery, getSelfQuery } from 'util/queries'
+import { getPostByIDQuery } from 'util/queries'
 import { Layout } from 'components'
 import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'

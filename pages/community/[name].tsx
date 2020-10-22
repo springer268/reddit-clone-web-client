@@ -1,7 +1,7 @@
 import { NextPage, NextPageContext } from 'next'
-import { ShallowCommunity, ShallowUser, TotalPost } from 'models'
-import { Layout, AddPostCard, PostCard } from '../../src/components'
-import { Header } from '../../src/components/ui'
+import { ShallowCommunity, TotalPost } from 'models'
+import { Layout, AddPostCard, PostCard } from 'components'
+import { Header } from 'components/ui'
 import { getCommunityByName as getCommunityByNameQuery, getPostsFromCommunityByIDQuery } from 'util/queries'
 import { useIsAuth, useSelf } from 'hooks'
 

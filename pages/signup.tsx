@@ -1,15 +1,13 @@
 import { useEffect } from 'react'
-import { NextPage, NextPageContext } from 'next'
-import { Layout, SignupCard } from '../src/components'
+import { NextPage } from 'next'
+import { Layout, SignupCard } from 'components'
 import Router from 'next/router'
-import { ShallowUser } from 'models'
-import { getSelfQuery } from 'util/queries'
 import { useSelf } from 'hooks'
 
 interface InitialProps {}
 
 const SignupPage: NextPage<InitialProps> = ({}) => {
-	const { self } = useSelf()
+	useSelf()
 
 	useEffect(() => {
 		if (document.cookie.length > 0) {

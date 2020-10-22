@@ -1,4 +1,4 @@
-import { ShallowUser, ShallowCommunity } from 'models'
+import { ShallowCommunity } from 'models'
 import { NextPage, NextPageContext } from 'next'
 import Link from 'next/link'
 import { getCommunitiesQuery, getSelfQuery } from 'util/queries'
