@@ -1,39 +1,43 @@
-import { useUser } from '../src/hooks'
-import { NextPage } from 'next'
-import { Layout, PostCard } from '../src/components'
-import { Wrapper, Header } from '../src/components/ui'
-import { Post } from 'models'
+import { NextPage, NextPageContext } from 'next'
+import { getSelfQuery, getUserByNameQuery } from 'util/queries'
+import { CompleteUser } from 'models'
+import { Layout, PostCard } from 'components'
+import { Header } from 'components/ui'
+import { useIsAuth } from 'hooks'
 
-interface InitialProps {}
+interface InitialProps {
+	self: CompleteUser | null
+}
 
-const ProfilePage: NextPage<InitialProps> = () => {
-	const { user, loading } = useUser()
+const ProfilePage: NextPage<InitialProps> = ({ self }) => {
+	useIsAuth(self)
 
-	if (loading) return <Layout></Layout>
-
-	if (!user) {
+	if (!self) {
 		return (
-			<Layout>
-				<Wrapper>
-					<Header>Login to view profile</Header>
-				</Wrapper>
+			<Layout self={self}>
+				<Header>You should login!</Header>
 			</Layout>
 		)
 	}
 
 	return (
-		<Layout>
-			<Wrapper>
-				<Header>{user.name}: Your posts</Header>
-				{user
-					.posts!.slice()
-					.sort((p1, p2) => p2.upvotes - p1.upvotes)
-					.map(post => (
-						<PostCard key={post.id} post={post as Required<Post>} />
-					))}
-			</Wrapper>
+		<Layout self={self}>
+			<Header>{`Your Profile: ${self.name}`}</Header>
+			{self.posts.map(post => (
+				<PostCard post={post} key={post.id} />
+			))}
 		</Layout>
 	)
+}
+
+ProfilePage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
+	const self = await getSelfQuery({ yeah: '' }, ctx)
+
+	if (!self) return { self }
+
+	const selfWithPosts = await getUserByNameQuery({ name: self.name }, ctx)
+
+	return { self: selfWithPosts }
 }
 
 export default ProfilePage

@@ -1,2 +1,3 @@
 export * from './useAwait';
-export * from './useUser';
+export * from './useIsAuth';
+export * from './useSelf';

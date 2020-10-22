@@ -1,0 +1,5 @@
+query GetPostByID($id: String!) {
+	GetPostByID(id: $id) {
+		...TotalPost
+	}
+}

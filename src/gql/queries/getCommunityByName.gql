@@ -1,0 +1,7 @@
+query GetCommunityByName($name: String!) {
+	GetCommunityByName(name: $name) {
+		id
+		name
+		followerCount
+	}
+}

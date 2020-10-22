@@ -1,37 +1,36 @@
+import { ShallowUser, TotalPost } from 'models'
 import { NextPage, NextPageContext } from 'next'
-import { Post } from '../../src/models'
-import { Layout } from '../../src/components'
-import { Header, Wrapper } from '../../src/components/ui'
+import { getPostByIDQuery, getSelfQuery } from 'util/queries'
+import { Layout } from 'components'
+import { Header } from 'components/ui'
 
 interface InitialProps {
-	post: Post | null
+	self: ShallowUser | null
+	post: TotalPost | null
 }
 
-const UserPage: NextPage<InitialProps> = ({ post }) => {
-	const MainContent: React.FC = () => {
-		return post ? (
-			<Header>
-				{post.title}, {post.content}
-			</Header>
-		) : (
-			<Header>No Post found</Header>
+const PostPage: NextPage<InitialProps> = ({ self, post }) => {
+	if (!post) {
+		return (
+			<Layout self={self}>
+				<Header>No post found</Header>
+			</Layout>
 		)
 	}
 
 	return (
-		<Layout>
-			<Wrapper>
-				<MainContent />
-			</Wrapper>
+		<Layout self={self}>
+			<Header>{post.title}</Header>
+			<p>{post.content}</p>
 		</Layout>
 	)
 }
 
-UserPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const id = ctx.query.id as string
-	const post = await Post.fetchByID(id)
+PostPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
+	const self = await getSelfQuery({ yeah: '' }, ctx)
+	const post = await getPostByIDQuery({ id: ctx.query.id as string }, ctx)
 
-	return { post }
+	return { self, post }
 }
 
-export default UserPage
+export default PostPage

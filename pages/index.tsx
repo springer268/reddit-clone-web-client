@@ -1,20 +1,27 @@
-import { useUser } from '../src/hooks'
-import { NextPage } from 'next'
+import { useIsAuth } from 'hooks'
+import { ShallowUser } from 'models'
+import { NextPage, NextPageContext } from 'next'
+import { getSelfQuery } from 'util/queries'
 import { Layout } from '../src/components'
-import { Wrapper, Header } from '../src/components/ui'
+import { Header } from '../src/components/ui'
 
-interface InitialProps {}
+interface InitialProps {
+	self: ShallowUser | null
+}
 
-const Feed: NextPage<InitialProps> = () => {
-	const { user } = useUser()
+const Feed: NextPage<InitialProps> = ({ self }) => {
+	useIsAuth(self)
 
 	return (
-		<Layout>
-			<Wrapper>
-				<Header>{user?.name ?? 'You should login!'}</Header>
-			</Wrapper>
+		<Layout self={self}>
+			<Header>{`${self?.name}'s Feed` ?? 'Default Feed'}</Header>
 		</Layout>
 	)
+}
+
+Feed.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
+	const self = await getSelfQuery({ yeah: '' }, ctx)
+	return { self }
 }
 
 export default Feed

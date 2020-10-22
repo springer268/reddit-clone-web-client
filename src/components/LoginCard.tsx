@@ -1,11 +1,13 @@
 import Router from 'next/router'
 import { Card, Input, ErrorMessage, Button, CardWrapper, Header } from './ui'
 import { Formik } from 'formik'
-import { User } from '../models'
+import { useAttemptLoginMutation } from 'generated'
 
 interface Props {}
 
 export const LoginCard: React.FC<Props> = ({}) => {
+	const [attemptLogin] = useAttemptLoginMutation()
+
 	return (
 		<Card>
 			<CardWrapper>
@@ -20,10 +22,10 @@ export const LoginCard: React.FC<Props> = ({}) => {
 
 						return errors
 					}}
-					onSubmit={async values => {
+					onSubmit={async ({ username: name, password }) => {
 						try {
-							await User.attemptLogin(values.username, values.password)
-							Router.reload()
+							await attemptLogin({ variables: { name, password } })
+							Router.push('/')
 						} catch (error) {
 							alert(error)
 						}

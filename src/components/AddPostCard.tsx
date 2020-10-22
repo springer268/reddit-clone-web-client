@@ -1,14 +1,17 @@
 import Router from 'next/router'
 import { Formik } from 'formik'
 import { Card, Header, CardWrapper, Input, Button, ErrorMessage } from './ui'
-import { Community, User } from '../models'
+import { ShallowCommunity, ShallowUser } from '../models'
+import { useAddPostMutation } from 'generated'
 
 interface Props {
-	community: Community
-	user: User
+	community: ShallowCommunity
+	self: ShallowUser
 }
 
-export const AddPostCard: React.FC<Props> = ({ community, user }) => {
+export const AddPostCard: React.FC<Props> = ({ community, self: user }) => {
+	const [addPost] = useAddPostMutation()
+
 	return (
 		<Card>
 			<CardWrapper>
@@ -26,9 +29,15 @@ export const AddPostCard: React.FC<Props> = ({ community, user }) => {
 						return errors
 					}}
 					onSubmit={async values => {
-						await Community.addPost(values.title, values.content, user.id, community.id)
+						await addPost({
+							variables: {
+								title: values.title,
+								content: values.content,
+								authorID: user.id,
+								communityID: community.id
+							}
+						})
 						Router.reload()
-						alert('Succesfully posted!')
 					}}
 				>
 					{({ values, handleChange, handleSubmit, isSubmitting, errors }) => (

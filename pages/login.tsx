@@ -1,27 +1,25 @@
-import { useEffect } from 'react'
-import { NextPage } from 'next'
+import { NextPage, NextPageContext } from 'next'
 import { Layout, LoginCard } from '../src/components'
-import { Wrapper } from '../src/components/ui'
-import Router from 'next/router'
+import { getSelfQuery } from 'util/queries'
+import { ShallowUser } from 'models'
 
-interface InitialProps {}
+interface InitialProps {
+	self: ShallowUser | null
+}
 
-const LoginPage: NextPage<InitialProps> = () => {
-	useEffect(() => {
-		if (document.cookie.length > 0) {
-			Router.push('/')
-		}
-	}, [])
-
+const LoginPage: NextPage<InitialProps> = ({ self }) => {
 	return (
-		<Layout>
-			<Wrapper>
-				<div style={{ marginTop: '25px' }}>
-					<LoginCard />
-				</div>
-			</Wrapper>
+		<Layout self={self}>
+			<div style={{ marginTop: '25px' }}>
+				<LoginCard />
+			</div>
 		</Layout>
 	)
+}
+
+LoginPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
+	const self = await getSelfQuery({ yeah: '' }, ctx)
+	return { self }
 }
 
 export default LoginPage

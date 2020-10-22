@@ -1,58 +1,63 @@
 import { NextPage, NextPageContext } from 'next'
-import { Community, Post } from '../../src/models'
+import { ShallowCommunity, ShallowUser, TotalPost } from 'models'
 import { Layout, AddPostCard, PostCard } from '../../src/components'
-import { Wrapper, Header } from '../../src/components/ui'
-import { useAwait, useUser } from '../../src/hooks'
+import { Header } from '../../src/components/ui'
+import {
+	getCommunityByName as getCommunityByNameQuery,
+	getPostsFromCommunityByIDQuery,
+	getSelfQuery
+} from 'util/queries'
+import { useIsAuth } from 'hooks'
 
 interface InitialProps {
-	community: Community | null
+	self: ShallowUser | null
+	community: ShallowCommunity | null
+	posts: TotalPost[] | null
 }
 
-const CommunityPage: NextPage<InitialProps> = ({ community }) => {
-	const { user, loading } = useUser()
-	const { data: posts, loading: loading2 } = useAwait(async () =>
-		community ? await Community.getPostsByID(community.id) : null
-	)
+const CommunityPage: NextPage<InitialProps> = ({ self, community, posts }) => {
+	useIsAuth(self)
 
-	if (community && user && posts) {
+	if (!community || !posts) {
 		return (
-			<Layout>
-				<Wrapper>
-					<Header>{community.name}</Header>
-					<div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr' }}>
-						<div>
-							{posts
-								.slice()
-								.sort((a, b) => b.upvotes - a.upvotes)
-								.map(post => (
-									<PostCard post={post as Required<Post>} key={post.id} />
-								))}
-						</div>
-						<div style={{ margin: '0 0 0 20px' }}>
-							<AddPostCard community={community} user={user} />
-						</div>
-					</div>
-				</Wrapper>
+			<Layout self={self}>
+				<Header>Community does not exist</Header>
 			</Layout>
 		)
 	}
 
-	if (loading || loading2) return <></>
-
 	return (
-		<Layout>
-			<Wrapper>
-				<Header>Community does not exist!</Header>
-			</Wrapper>
+		<Layout self={self}>
+			<Header>{community.name}</Header>
+			<div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr' }}>
+				<div>
+					{posts.map(post => (
+						<PostCard post={post} key={post.id} />
+					))}
+				</div>
+				{self && (
+					<>
+						<div style={{ margin: '0 0 0 20px' }}>
+							<AddPostCard community={community} self={self} />
+						</div>
+					</>
+				)}
+			</div>
 		</Layout>
 	)
 }
 
 CommunityPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const name = ctx.query.name as string
-	const community = await Community.fetchByName(name)
+	const self = await getSelfQuery({ yeah: '' }, ctx)
 
-	return { community }
+	const name = ctx.query.name as string
+	const community = await getCommunityByNameQuery({ name }, ctx)
+
+	if (!community) return { community: null, posts: null, self }
+
+	const posts = await getPostsFromCommunityByIDQuery({ communityID: community.id }, ctx)
+
+	return { community, posts, self }
 }
 
 export default CommunityPage

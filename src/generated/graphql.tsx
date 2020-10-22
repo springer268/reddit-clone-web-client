@@ -1,5 +1,6 @@
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
+import * as ApolloReactHoc from '@apollo/client/react/hoc';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** All built-in and custom scalars, mapped to their actual values */
@@ -19,6 +20,7 @@ export type Query = {
   GetPostByID?: Maybe<Post>;
   GetCommunityByID?: Maybe<Community>;
   GetCommunityByName?: Maybe<Community>;
+  GetCommunities: Array<Community>;
   GetPostsFromCommunityByID?: Maybe<Array<Post>>;
 };
 
@@ -123,6 +125,42 @@ export type MutationAddCommunityByNameArgs = {
   name: Scalars['String'];
 };
 
+export type CompleteUserFragment = (
+  { __typename?: 'User' }
+  & { posts: Array<(
+    { __typename?: 'Post' }
+    & TotalPostFragment
+  )> }
+  & PartialUserFragment
+);
+
+export type PartialCommunityFragment = (
+  { __typename?: 'Community' }
+  & Pick<Community, 'id' | 'name' | 'followerCount'>
+);
+
+export type PartialPostFragment = (
+  { __typename?: 'Post' }
+  & Pick<Post, 'id' | 'title' | 'content' | 'upvotes' | 'downvotes'>
+);
+
+export type PartialUserFragment = (
+  { __typename?: 'User' }
+  & Pick<User, 'id' | 'name' | 'email' | 'description'>
+);
+
+export type TotalPostFragment = (
+  { __typename?: 'Post' }
+  & { author: (
+    { __typename?: 'User' }
+    & PartialUserFragment
+  ), community: (
+    { __typename?: 'Community' }
+    & PartialCommunityFragment
+  ) }
+  & PartialPostFragment
+);
+
 export type AddPostMutationVariables = Exact<{
   communityID: Scalars['String'];
   authorID: Scalars['String'];
@@ -149,7 +187,7 @@ export type AddUserMutation = (
   { __typename?: 'Mutation' }
   & { AddUser: (
     { __typename?: 'User' }
-    & Pick<User, 'name'>
+    & Pick<User, 'id'>
   ) }
 );
 
@@ -165,6 +203,17 @@ export type AttemptLoginMutation = (
     { __typename?: 'User' }
     & Pick<User, 'id' | 'name' | 'email' | 'description'>
   ) }
+);
+
+export type GetCommunitiesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCommunitiesQuery = (
+  { __typename?: 'Query' }
+  & { GetCommunities: Array<(
+    { __typename?: 'Community' }
+    & PartialCommunityFragment
+  )> }
 );
 
 export type GetCommunityByNameQueryVariables = Exact<{
@@ -189,14 +238,7 @@ export type GetPostByIdQuery = (
   { __typename?: 'Query' }
   & { GetPostByID?: Maybe<(
     { __typename?: 'Post' }
-    & Pick<Post, 'id' | 'title' | 'content' | 'upvotes' | 'downvotes'>
-    & { author: (
-      { __typename?: 'User' }
-      & Pick<User, 'name'>
-    ), community: (
-      { __typename?: 'Community' }
-      & Pick<Community, 'name'>
-    ) }
+    & TotalPostFragment
   )> }
 );
 
@@ -229,18 +271,7 @@ export type GetSelfQuery = (
   { __typename?: 'Query' }
   & { GetSelf?: Maybe<(
     { __typename?: 'User' }
-    & Pick<User, 'name' | 'id' | 'email' | 'description'>
-    & { posts: Array<(
-      { __typename?: 'Post' }
-      & Pick<Post, 'id' | 'title' | 'content' | 'upvotes' | 'downvotes'>
-      & { author: (
-        { __typename?: 'User' }
-        & Pick<User, 'name' | 'id' | 'email' | 'description'>
-      ), community: (
-        { __typename?: 'Community' }
-        & Pick<Community, 'id' | 'name' | 'followerCount'>
-      ) }
-    )> }
+    & PartialUserFragment
   )> }
 );
 
@@ -253,35 +284,56 @@ export type GetUserByNameQuery = (
   { __typename?: 'Query' }
   & { GetUserByName?: Maybe<(
     { __typename?: 'User' }
-    & Pick<User, 'name' | 'email' | 'description'>
+    & CompleteUserFragment
   )> }
 );
 
-export type GetUserByNameWithPostsQueryVariables = Exact<{
-  name: Scalars['String'];
-}>;
-
-
-export type GetUserByNameWithPostsQuery = (
-  { __typename?: 'Query' }
-  & { GetUserByName?: Maybe<(
-    { __typename?: 'User' }
-    & Pick<User, 'name' | 'email' | 'description'>
-    & { posts: Array<(
-      { __typename?: 'Post' }
-      & Pick<Post, 'id' | 'title' | 'content' | 'upvotes' | 'downvotes'>
-      & { community: (
-        { __typename?: 'Community' }
-        & Pick<Community, 'id' | 'name' | 'followerCount'>
-      ), author: (
-        { __typename?: 'User' }
-        & Pick<User, 'name' | 'id' | 'email' | 'description'>
-      ) }
-    )> }
-  )> }
-);
-
-
+export const PartialUserFragmentDoc = gql`
+    fragment PartialUser on User {
+  id
+  name
+  email
+  description
+}
+    `;
+export const PartialPostFragmentDoc = gql`
+    fragment PartialPost on Post {
+  id
+  title
+  content
+  upvotes
+  downvotes
+}
+    `;
+export const PartialCommunityFragmentDoc = gql`
+    fragment PartialCommunity on Community {
+  id
+  name
+  followerCount
+}
+    `;
+export const TotalPostFragmentDoc = gql`
+    fragment TotalPost on Post {
+  ...PartialPost
+  author {
+    ...PartialUser
+  }
+  community {
+    ...PartialCommunity
+  }
+}
+    ${PartialPostFragmentDoc}
+${PartialUserFragmentDoc}
+${PartialCommunityFragmentDoc}`;
+export const CompleteUserFragmentDoc = gql`
+    fragment CompleteUser on User {
+  ...PartialUser
+  posts {
+    ...TotalPost
+  }
+}
+    ${PartialUserFragmentDoc}
+${TotalPostFragmentDoc}`;
 export const AddPostDocument = gql`
     mutation AddPost($communityID: String!, $authorID: String!, $title: String!, $content: String!) {
   AddPost(communityID: $communityID, authorID: $authorID, title: $title, content: $content) {
@@ -290,6 +342,19 @@ export const AddPostDocument = gql`
 }
     `;
 export type AddPostMutationFn = Apollo.MutationFunction<AddPostMutation, AddPostMutationVariables>;
+export type AddPostProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: Apollo.MutationFunction<AddPostMutation, AddPostMutationVariables>
+    } & TChildProps;
+export function withAddPost<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AddPostMutation,
+  AddPostMutationVariables,
+  AddPostProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, AddPostMutation, AddPostMutationVariables, AddPostProps<TChildProps, TDataName>>(AddPostDocument, {
+      alias: 'addPost',
+      ...operationOptions
+    });
+};
 
 /**
  * __useAddPostMutation__
@@ -320,11 +385,24 @@ export type AddPostMutationOptions = Apollo.BaseMutationOptions<AddPostMutation,
 export const AddUserDocument = gql`
     mutation AddUser($name: String!, $password: String!) {
   AddUser(name: $name, password: $password) {
-    name
+    id
   }
 }
     `;
 export type AddUserMutationFn = Apollo.MutationFunction<AddUserMutation, AddUserMutationVariables>;
+export type AddUserProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: Apollo.MutationFunction<AddUserMutation, AddUserMutationVariables>
+    } & TChildProps;
+export function withAddUser<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AddUserMutation,
+  AddUserMutationVariables,
+  AddUserProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, AddUserMutation, AddUserMutationVariables, AddUserProps<TChildProps, TDataName>>(AddUserDocument, {
+      alias: 'addUser',
+      ...operationOptions
+    });
+};
 
 /**
  * __useAddUserMutation__
@@ -361,6 +439,19 @@ export const AttemptLoginDocument = gql`
 }
     `;
 export type AttemptLoginMutationFn = Apollo.MutationFunction<AttemptLoginMutation, AttemptLoginMutationVariables>;
+export type AttemptLoginProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: Apollo.MutationFunction<AttemptLoginMutation, AttemptLoginMutationVariables>
+    } & TChildProps;
+export function withAttemptLogin<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AttemptLoginMutation,
+  AttemptLoginMutationVariables,
+  AttemptLoginProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, AttemptLoginMutation, AttemptLoginMutationVariables, AttemptLoginProps<TChildProps, TDataName>>(AttemptLoginDocument, {
+      alias: 'attemptLogin',
+      ...operationOptions
+    });
+};
 
 /**
  * __useAttemptLoginMutation__
@@ -386,6 +477,51 @@ export function useAttemptLoginMutation(baseOptions?: Apollo.MutationHookOptions
 export type AttemptLoginMutationHookResult = ReturnType<typeof useAttemptLoginMutation>;
 export type AttemptLoginMutationResult = Apollo.MutationResult<AttemptLoginMutation>;
 export type AttemptLoginMutationOptions = Apollo.BaseMutationOptions<AttemptLoginMutation, AttemptLoginMutationVariables>;
+export const GetCommunitiesDocument = gql`
+    query GetCommunities {
+  GetCommunities {
+    ...PartialCommunity
+  }
+}
+    ${PartialCommunityFragmentDoc}`;
+export type GetCommunitiesProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<GetCommunitiesQuery, GetCommunitiesQueryVariables>
+    } & TChildProps;
+export function withGetCommunities<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetCommunitiesQuery,
+  GetCommunitiesQueryVariables,
+  GetCommunitiesProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, GetCommunitiesQuery, GetCommunitiesQueryVariables, GetCommunitiesProps<TChildProps, TDataName>>(GetCommunitiesDocument, {
+      alias: 'getCommunities',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetCommunitiesQuery__
+ *
+ * To run a query within a React component, call `useGetCommunitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommunitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCommunitiesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCommunitiesQuery(baseOptions?: Apollo.QueryHookOptions<GetCommunitiesQuery, GetCommunitiesQueryVariables>) {
+        return Apollo.useQuery<GetCommunitiesQuery, GetCommunitiesQueryVariables>(GetCommunitiesDocument, baseOptions);
+      }
+export function useGetCommunitiesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCommunitiesQuery, GetCommunitiesQueryVariables>) {
+          return Apollo.useLazyQuery<GetCommunitiesQuery, GetCommunitiesQueryVariables>(GetCommunitiesDocument, baseOptions);
+        }
+export type GetCommunitiesQueryHookResult = ReturnType<typeof useGetCommunitiesQuery>;
+export type GetCommunitiesLazyQueryHookResult = ReturnType<typeof useGetCommunitiesLazyQuery>;
+export type GetCommunitiesQueryResult = Apollo.QueryResult<GetCommunitiesQuery, GetCommunitiesQueryVariables>;
 export const GetCommunityByNameDocument = gql`
     query GetCommunityByName($name: String!) {
   GetCommunityByName(name: $name) {
@@ -395,6 +531,19 @@ export const GetCommunityByNameDocument = gql`
   }
 }
     `;
+export type GetCommunityByNameProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<GetCommunityByNameQuery, GetCommunityByNameQueryVariables>
+    } & TChildProps;
+export function withGetCommunityByName<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetCommunityByNameQuery,
+  GetCommunityByNameQueryVariables,
+  GetCommunityByNameProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, GetCommunityByNameQuery, GetCommunityByNameQueryVariables, GetCommunityByNameProps<TChildProps, TDataName>>(GetCommunityByNameDocument, {
+      alias: 'getCommunityByName',
+      ...operationOptions
+    });
+};
 
 /**
  * __useGetCommunityByNameQuery__
@@ -424,20 +573,23 @@ export type GetCommunityByNameQueryResult = Apollo.QueryResult<GetCommunityByNam
 export const GetPostByIdDocument = gql`
     query GetPostByID($id: String!) {
   GetPostByID(id: $id) {
-    id
-    title
-    content
-    upvotes
-    downvotes
-    author {
-      name
-    }
-    community {
-      name
-    }
+    ...TotalPost
   }
 }
-    `;
+    ${TotalPostFragmentDoc}`;
+export type GetPostByIdProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<GetPostByIdQuery, GetPostByIdQueryVariables>
+    } & TChildProps;
+export function withGetPostById<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetPostByIdQuery,
+  GetPostByIdQueryVariables,
+  GetPostByIdProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, GetPostByIdQuery, GetPostByIdQueryVariables, GetPostByIdProps<TChildProps, TDataName>>(GetPostByIdDocument, {
+      alias: 'getPostById',
+      ...operationOptions
+    });
+};
 
 /**
  * __useGetPostByIdQuery__
@@ -486,6 +638,19 @@ export const GetPostsFromCommunityByIdDocument = gql`
   }
 }
     `;
+export type GetPostsFromCommunityByIdProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<GetPostsFromCommunityByIdQuery, GetPostsFromCommunityByIdQueryVariables>
+    } & TChildProps;
+export function withGetPostsFromCommunityById<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetPostsFromCommunityByIdQuery,
+  GetPostsFromCommunityByIdQueryVariables,
+  GetPostsFromCommunityByIdProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, GetPostsFromCommunityByIdQuery, GetPostsFromCommunityByIdQueryVariables, GetPostsFromCommunityByIdProps<TChildProps, TDataName>>(GetPostsFromCommunityByIdDocument, {
+      alias: 'getPostsFromCommunityById',
+      ...operationOptions
+    });
+};
 
 /**
  * __useGetPostsFromCommunityByIdQuery__
@@ -515,31 +680,23 @@ export type GetPostsFromCommunityByIdQueryResult = Apollo.QueryResult<GetPostsFr
 export const GetSelfDocument = gql`
     query GetSelf($yeah: String!) {
   GetSelf(yeah: $yeah) {
-    name
-    id
-    email
-    description
-    posts {
-      id
-      title
-      content
-      upvotes
-      downvotes
-      author {
-        name
-        id
-        email
-        description
-      }
-      community {
-        id
-        name
-        followerCount
-      }
-    }
+    ...PartialUser
   }
 }
-    `;
+    ${PartialUserFragmentDoc}`;
+export type GetSelfProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<GetSelfQuery, GetSelfQueryVariables>
+    } & TChildProps;
+export function withGetSelf<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetSelfQuery,
+  GetSelfQueryVariables,
+  GetSelfProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, GetSelfQuery, GetSelfQueryVariables, GetSelfProps<TChildProps, TDataName>>(GetSelfDocument, {
+      alias: 'getSelf',
+      ...operationOptions
+    });
+};
 
 /**
  * __useGetSelfQuery__
@@ -569,12 +726,23 @@ export type GetSelfQueryResult = Apollo.QueryResult<GetSelfQuery, GetSelfQueryVa
 export const GetUserByNameDocument = gql`
     query GetUserByName($name: String!) {
   GetUserByName(name: $name) {
-    name
-    email
-    description
+    ...CompleteUser
   }
 }
-    `;
+    ${CompleteUserFragmentDoc}`;
+export type GetUserByNameProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<GetUserByNameQuery, GetUserByNameQueryVariables>
+    } & TChildProps;
+export function withGetUserByName<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetUserByNameQuery,
+  GetUserByNameQueryVariables,
+  GetUserByNameProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, GetUserByNameQuery, GetUserByNameQueryVariables, GetUserByNameProps<TChildProps, TDataName>>(GetUserByNameDocument, {
+      alias: 'getUserByName',
+      ...operationOptions
+    });
+};
 
 /**
  * __useGetUserByNameQuery__
@@ -601,56 +769,3 @@ export function useGetUserByNameLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type GetUserByNameQueryHookResult = ReturnType<typeof useGetUserByNameQuery>;
 export type GetUserByNameLazyQueryHookResult = ReturnType<typeof useGetUserByNameLazyQuery>;
 export type GetUserByNameQueryResult = Apollo.QueryResult<GetUserByNameQuery, GetUserByNameQueryVariables>;
-export const GetUserByNameWithPostsDocument = gql`
-    query GetUserByNameWithPosts($name: String!) {
-  GetUserByName(name: $name) {
-    name
-    email
-    description
-    posts {
-      id
-      title
-      content
-      upvotes
-      downvotes
-      community {
-        id
-        name
-        followerCount
-      }
-      author {
-        name
-        id
-        email
-        description
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useGetUserByNameWithPostsQuery__
- *
- * To run a query within a React component, call `useGetUserByNameWithPostsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetUserByNameWithPostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetUserByNameWithPostsQuery({
- *   variables: {
- *      name: // value for 'name'
- *   },
- * });
- */
-export function useGetUserByNameWithPostsQuery(baseOptions?: Apollo.QueryHookOptions<GetUserByNameWithPostsQuery, GetUserByNameWithPostsQueryVariables>) {
-        return Apollo.useQuery<GetUserByNameWithPostsQuery, GetUserByNameWithPostsQueryVariables>(GetUserByNameWithPostsDocument, baseOptions);
-      }
-export function useGetUserByNameWithPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserByNameWithPostsQuery, GetUserByNameWithPostsQueryVariables>) {
-          return Apollo.useLazyQuery<GetUserByNameWithPostsQuery, GetUserByNameWithPostsQueryVariables>(GetUserByNameWithPostsDocument, baseOptions);
-        }
-export type GetUserByNameWithPostsQueryHookResult = ReturnType<typeof useGetUserByNameWithPostsQuery>;
-export type GetUserByNameWithPostsLazyQueryHookResult = ReturnType<typeof useGetUserByNameWithPostsLazyQuery>;
-export type GetUserByNameWithPostsQueryResult = Apollo.QueryResult<GetUserByNameWithPostsQuery, GetUserByNameWithPostsQueryVariables>;

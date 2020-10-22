@@ -1,12 +1,16 @@
 import { useEffect } from 'react'
-import { NextPage } from 'next'
+import { NextPage, NextPageContext } from 'next'
 import { Layout } from '../src/components'
 import { Wrapper, Header } from '../src/components/ui'
 import Router from 'next/router'
+import { getSelfQuery } from 'util/queries'
+import { ShallowUser } from 'models'
 
-interface InitialProps {}
+interface InitialProps {
+	self: ShallowUser | null
+}
 
-const LogoutPage: NextPage<InitialProps> = () => {
+const LogoutPage: NextPage<InitialProps> = ({ self }) => {
 	useEffect(() => {
 		if (document.cookie.length > 0) {
 			document.cookie.split(';').forEach(function (c) {
@@ -19,12 +23,15 @@ const LogoutPage: NextPage<InitialProps> = () => {
 	}, [])
 
 	return (
-		<Layout>
-			<Wrapper>
-				<Header>Successfully logged out</Header>
-			</Wrapper>
+		<Layout self={self}>
+			<Header>Successfully logged out</Header>
 		</Layout>
 	)
+}
+
+LogoutPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
+	const self = await getSelfQuery({ yeah: '' }, ctx)
+	return { self }
 }
 
 export default LogoutPage

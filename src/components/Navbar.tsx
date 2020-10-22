@@ -1,4 +1,4 @@
-import { useUser } from 'hooks'
+import { ShallowUser } from 'models'
 import Link from 'next/link'
 import styled from 'styled-components'
 import { theme } from './ui/theme'
@@ -24,9 +24,11 @@ const NavUI = styled.nav`
 	}
 `
 
-export const Navbar = () => {
-	const { user, loading } = useUser()
+interface Props {
+	self: ShallowUser | null
+}
 
+export const Navbar: React.FC<Props> = ({ self }) => {
 	return (
 		<NavUI>
 			<ul>
@@ -36,14 +38,18 @@ export const Navbar = () => {
 				<li>
 					<Link href='/profile'>Profile</Link>
 				</li>
-				<li></li>
-				<li></li>
 			</ul>
 			<ul>
-				<li>
-					<Link href='/createcommunity'>CreateCommunity</Link>
-				</li>
-				{!user && !loading ? (
+				{self ? (
+					<>
+						<li>
+							<Link href='/community'>Communities</Link>
+						</li>
+						<li>
+							<Link href='/logout'>Logout</Link>
+						</li>
+					</>
+				) : (
 					<>
 						<li>
 							<Link href='/login'>Login</Link>
@@ -52,14 +58,7 @@ export const Navbar = () => {
 							<Link href='/signup'>Signup</Link>
 						</li>
 					</>
-				) : (
-					<>
-						<li>
-							<Link href='/logout'>Logout</Link>
-						</li>
-					</>
 				)}
-				<li></li>
 			</ul>
 		</NavUI>
 	)

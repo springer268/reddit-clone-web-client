@@ -1,0 +1,7 @@
+fragment PartialPost on Post {
+	id
+	title
+	content
+	upvotes
+	downvotes
+}

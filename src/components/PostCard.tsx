@@ -2,7 +2,7 @@ import Link from 'next/link'
 import styled from 'styled-components'
 import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Post } from '../models'
+import { TotalPost } from '../models'
 import { Card } from './ui'
 import { theme } from './ui/theme'
 
@@ -117,7 +117,7 @@ const Content = styled.p`
 // COMPONENT
 
 interface Props {
-	post: Required<Post>
+	post: TotalPost
 }
 
 export const PostCard: React.FC<Props> = ({ post }) => {
