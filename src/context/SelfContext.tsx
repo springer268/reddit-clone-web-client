@@ -2,14 +2,14 @@ import { createContext, Dispatch, FC, SetStateAction, useState } from 'react'
 import { ShallowUser } from '../models'
 
 interface ISelfContext {
-	self: ShallowUser | null | undefined
+	self: ShallowUser | null
 	setSelf: Dispatch<SetStateAction<ISelfContext['self']>>
 }
 
-export const UserContext = createContext({} as ISelfContext)
+export const SelfContext = createContext({} as ISelfContext)
 
-export const UserContextProvider: FC = ({ children }) => {
-	const [self, setSelf] = useState<ISelfContext['self']>()
+export const SelfContextProvider: FC = ({ children }) => {
+	const [self, setSelf] = useState<ISelfContext['self']>(null)
 
-	return <UserContext.Provider value={{ self, setSelf }}>{children}</UserContext.Provider>
+	return <SelfContext.Provider value={{ self, setSelf }}>{children}</SelfContext.Provider>
 }

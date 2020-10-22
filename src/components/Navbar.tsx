@@ -1,3 +1,4 @@
+import { useSelf } from 'hooks'
 import { ShallowUser } from 'models'
 import Link from 'next/link'
 import styled from 'styled-components'
@@ -24,11 +25,11 @@ const NavUI = styled.nav`
 	}
 `
 
-interface Props {
-	self: ShallowUser | null
-}
+interface Props {}
 
-export const Navbar: React.FC<Props> = ({ self }) => {
+export const Navbar: React.FC<Props> = () => {
+	const { self } = useSelf()
+
 	return (
 		<NavUI>
 			<ul>

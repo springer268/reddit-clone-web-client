@@ -1,29 +1,25 @@
 import { NextPage, NextPageContext } from 'next'
 import { getSelfQuery, getUserByNameQuery } from 'util/queries'
-import { CompleteUser } from 'models'
+import { ShallowUser, TotalPost } from 'models'
 import { Layout, PostCard } from 'components'
 import { Header } from 'components/ui'
-import { useIsAuth } from 'hooks'
+import { useIsAuth, useSelf } from 'hooks'
 
 interface InitialProps {
-	self: CompleteUser | null
+	selfData: ShallowUser | null
+	posts: TotalPost[] | null
 }
 
-const ProfilePage: NextPage<InitialProps> = ({ self }) => {
+const ProfilePage: NextPage<InitialProps> = ({ selfData, posts }) => {
+	const { self } = useSelf(selfData)
 	useIsAuth(self)
 
-	if (!self) {
-		return (
-			<Layout self={self}>
-				<Header>You should login!</Header>
-			</Layout>
-		)
-	}
+	if (!self || !posts) return <Layout></Layout>
 
 	return (
-		<Layout self={self}>
+		<Layout>
 			<Header>{`Your Profile: ${self.name}`}</Header>
-			{self.posts.map(post => (
+			{posts.map(post => (
 				<PostCard post={post} key={post.id} />
 			))}
 		</Layout>
@@ -31,13 +27,11 @@ const ProfilePage: NextPage<InitialProps> = ({ self }) => {
 }
 
 ProfilePage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const self = await getSelfQuery({ yeah: '' }, ctx)
+	const selfData = await getSelfQuery({}, ctx)
+	if (!selfData) return { selfData, posts: null }
 
-	if (!self) return { self }
-
-	const selfWithPosts = await getUserByNameQuery({ name: self.name }, ctx)
-
-	return { self: selfWithPosts }
+	const user = await getUserByNameQuery({ name: selfData.name }, ctx)
+	return { selfData, posts: user?.posts ?? null }
 }
 
 export default ProfilePage

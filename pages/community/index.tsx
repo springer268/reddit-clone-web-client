@@ -4,18 +4,21 @@ import Link from 'next/link'
 import { getCommunitiesQuery, getSelfQuery } from 'util/queries'
 import { Layout } from 'components'
 import { Header } from 'components/ui'
-import { useIsAuth } from 'hooks'
+import { useIsAuth, useSelf } from 'hooks'
 
 interface InitialProps {
-	self: ShallowUser | null
+	selfData: ShallowUser | null
 	communities: ShallowCommunity[]
 }
 
-const CommunitiesPage: NextPage<InitialProps> = ({ self, communities }) => {
+const CommunitiesPage: NextPage<InitialProps> = ({ selfData, communities }) => {
+	const { self } = useSelf(selfData)
 	useIsAuth(self)
 
+	if (!self) return <Layout></Layout>
+
 	return (
-		<Layout self={self}>
+		<Layout>
 			<Header>Hello</Header>
 			{communities.map(community => (
 				<Link href={`/community/${community.name}`} key={community.id}>
@@ -27,10 +30,10 @@ const CommunitiesPage: NextPage<InitialProps> = ({ self, communities }) => {
 }
 
 CommunitiesPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const self = await getSelfQuery({ yeah: '' }, ctx)
+	const selfData = await getSelfQuery({}, ctx)
 	const communities = await getCommunitiesQuery({}, ctx)
 
-	return { self, communities }
+	return { selfData, communities }
 }
 
 export default CommunitiesPage

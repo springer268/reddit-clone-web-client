@@ -2,10 +2,14 @@ import Router from 'next/router'
 import { Card, Input, ErrorMessage, Button, CardWrapper, Header } from './ui'
 import { Formik } from 'formik'
 import { useAttemptLoginMutation } from 'generated'
+import { useContext } from 'react'
+import { SelfContext } from 'context'
+import { ShallowUser } from 'models'
 
 interface Props {}
 
 export const LoginCard: React.FC<Props> = ({}) => {
+	const { setSelf } = useContext(SelfContext)
 	const [attemptLogin] = useAttemptLoginMutation()
 
 	return (
@@ -24,7 +28,8 @@ export const LoginCard: React.FC<Props> = ({}) => {
 					}}
 					onSubmit={async ({ username: name, password }) => {
 						try {
-							await attemptLogin({ variables: { name, password } })
+							const { data } = await attemptLogin({ variables: { name, password } })
+							setSelf(data?.AttemptLogin as ShallowUser)
 							Router.push('/')
 						} catch (error) {
 							alert(error)

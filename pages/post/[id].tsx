@@ -3,23 +3,29 @@ import { NextPage, NextPageContext } from 'next'
 import { getPostByIDQuery, getSelfQuery } from 'util/queries'
 import { Layout } from 'components'
 import { Header } from 'components/ui'
+import { useIsAuth, useSelf } from 'hooks'
 
 interface InitialProps {
-	self: ShallowUser | null
+	selfData: ShallowUser | null
 	post: TotalPost | null
 }
 
-const PostPage: NextPage<InitialProps> = ({ self, post }) => {
+const PostPage: NextPage<InitialProps> = ({ selfData, post }) => {
+	const { self } = useSelf(selfData)
+	useIsAuth(self)
+
+	if (!self) return <Layout></Layout>
+
 	if (!post) {
 		return (
-			<Layout self={self}>
+			<Layout>
 				<Header>No post found</Header>
 			</Layout>
 		)
 	}
 
 	return (
-		<Layout self={self}>
+		<Layout>
 			<Header>{post.title}</Header>
 			<p>{post.content}</p>
 		</Layout>
@@ -27,10 +33,10 @@ const PostPage: NextPage<InitialProps> = ({ self, post }) => {
 }
 
 PostPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const self = await getSelfQuery({ yeah: '' }, ctx)
+	const selfData = await getSelfQuery({}, ctx)
 	const post = await getPostByIDQuery({ id: ctx.query.id as string }, ctx)
 
-	return { self, post }
+	return { selfData, post }
 }
 
 export default PostPage

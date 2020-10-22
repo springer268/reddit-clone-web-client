@@ -1,5 +1,5 @@
-query GetSelf($yeah: String!) {
-	GetSelf(yeah: $yeah) {
+query GetSelf {
+	GetSelf {
 		...PartialUser
 	}
 }

@@ -25,11 +25,6 @@ export type Query = {
 };
 
 
-export type QueryGetSelfArgs = {
-  yeah: Scalars['String'];
-};
-
-
 export type QueryGetUserByIdArgs = {
   id: Scalars['String'];
 };
@@ -262,9 +257,7 @@ export type GetPostsFromCommunityByIdQuery = (
   )>> }
 );
 
-export type GetSelfQueryVariables = Exact<{
-  yeah: Scalars['String'];
-}>;
+export type GetSelfQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetSelfQuery = (
@@ -678,8 +671,8 @@ export type GetPostsFromCommunityByIdQueryHookResult = ReturnType<typeof useGetP
 export type GetPostsFromCommunityByIdLazyQueryHookResult = ReturnType<typeof useGetPostsFromCommunityByIdLazyQuery>;
 export type GetPostsFromCommunityByIdQueryResult = Apollo.QueryResult<GetPostsFromCommunityByIdQuery, GetPostsFromCommunityByIdQueryVariables>;
 export const GetSelfDocument = gql`
-    query GetSelf($yeah: String!) {
-  GetSelf(yeah: $yeah) {
+    query GetSelf {
+  GetSelf {
     ...PartialUser
   }
 }
@@ -710,7 +703,6 @@ export function withGetSelf<TProps, TChildProps = {}, TDataName extends string =
  * @example
  * const { data, loading, error } = useGetSelfQuery({
  *   variables: {
- *      yeah: // value for 'yeah'
  *   },
  * });
  */

@@ -7,27 +7,30 @@ import {
 	getPostsFromCommunityByIDQuery,
 	getSelfQuery
 } from 'util/queries'
-import { useIsAuth } from 'hooks'
+import { useIsAuth, useSelf } from 'hooks'
 
 interface InitialProps {
-	self: ShallowUser | null
+	selfData: ShallowUser | null
 	community: ShallowCommunity | null
 	posts: TotalPost[] | null
 }
 
-const CommunityPage: NextPage<InitialProps> = ({ self, community, posts }) => {
+const CommunityPage: NextPage<InitialProps> = ({ selfData, community, posts }) => {
+	const { self } = useSelf(selfData)
 	useIsAuth(self)
+
+	if (!self) return <Layout></Layout>
 
 	if (!community || !posts) {
 		return (
-			<Layout self={self}>
+			<Layout>
 				<Header>Community does not exist</Header>
 			</Layout>
 		)
 	}
 
 	return (
-		<Layout self={self}>
+		<Layout>
 			<Header>{community.name}</Header>
 			<div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr' }}>
 				<div>
@@ -48,16 +51,16 @@ const CommunityPage: NextPage<InitialProps> = ({ self, community, posts }) => {
 }
 
 CommunityPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const self = await getSelfQuery({ yeah: '' }, ctx)
+	const selfData = await getSelfQuery({}, ctx)
 
 	const name = ctx.query.name as string
 	const community = await getCommunityByNameQuery({ name }, ctx)
 
-	if (!community) return { community: null, posts: null, self }
+	if (!community) return { community: null, posts: null, selfData }
 
 	const posts = await getPostsFromCommunityByIDQuery({ communityID: community.id }, ctx)
 
-	return { community, posts, self }
+	return { community, posts, selfData }
 }
 
 export default CommunityPage

@@ -1,15 +1,12 @@
-import { ShallowUser } from 'models'
 import { Navbar } from '.'
 import { Wrapper } from './ui'
 
-interface Props {
-	self: ShallowUser | null
-}
+interface Props {}
 
-export const Layout: React.FC<Props> = ({ children, self }) => {
+export const Layout: React.FC<Props> = ({ children }) => {
 	return (
 		<>
-			<Navbar self={self} />
+			<Navbar />
 			<Wrapper>{children}</Wrapper>
 		</>
 	)

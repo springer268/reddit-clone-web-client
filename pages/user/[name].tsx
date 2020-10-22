@@ -3,26 +3,29 @@ import { CompleteUser, ShallowUser } from 'models'
 import { Layout, PostCard } from 'components'
 import { Header } from 'components/ui'
 import { getSelfQuery, getUserByNameQuery } from 'util/queries'
-import { useIsAuth } from 'hooks'
+import { useIsAuth, useSelf } from 'hooks'
 
 interface InitialProps {
-	self: ShallowUser | null
+	selfData: ShallowUser | null
 	user: CompleteUser | null
 }
 
-const UserPage: NextPage<InitialProps> = ({ user, self }) => {
+const UserPage: NextPage<InitialProps> = ({ user, selfData }) => {
+	const { self } = useSelf(selfData)
 	useIsAuth(self)
+
+	if (!self) return <Layout></Layout>
 
 	if (!user) {
 		return (
-			<Layout self={self}>
+			<Layout>
 				<Header>User does not exist.</Header>
 			</Layout>
 		)
 	}
 
 	return (
-		<Layout self={self}>
+		<Layout>
 			<Header>{user.name}</Header>
 			{user.posts.map(post => (
 				<PostCard post={post} key={post.id} />
@@ -32,10 +35,10 @@ const UserPage: NextPage<InitialProps> = ({ user, self }) => {
 }
 
 UserPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const self = await getSelfQuery({ yeah: '' }, ctx)
+	const selfData = await getSelfQuery({}, ctx)
 	const user = await getUserByNameQuery({ name: ctx.query.name as string })
 
-	return { user, self }
+	return { user, selfData }
 }
 
 export default UserPage
