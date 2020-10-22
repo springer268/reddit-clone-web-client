@@ -2,21 +2,16 @@ import { NextPage, NextPageContext } from 'next'
 import { ShallowCommunity, ShallowUser, TotalPost } from 'models'
 import { Layout, AddPostCard, PostCard } from '../../src/components'
 import { Header } from '../../src/components/ui'
-import {
-	getCommunityByName as getCommunityByNameQuery,
-	getPostsFromCommunityByIDQuery,
-	getSelfQuery
-} from 'util/queries'
+import { getCommunityByName as getCommunityByNameQuery, getPostsFromCommunityByIDQuery } from 'util/queries'
 import { useIsAuth, useSelf } from 'hooks'
 
 interface InitialProps {
-	selfData: ShallowUser | null
 	community: ShallowCommunity | null
 	posts: TotalPost[] | null
 }
 
-const CommunityPage: NextPage<InitialProps> = ({ selfData, community, posts }) => {
-	const { self } = useSelf(selfData)
+const CommunityPage: NextPage<InitialProps> = ({ community, posts }) => {
+	const { self } = useSelf()
 	useIsAuth(self)
 
 	if (!self) return <Layout></Layout>
@@ -51,16 +46,14 @@ const CommunityPage: NextPage<InitialProps> = ({ selfData, community, posts }) =
 }
 
 CommunityPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const selfData = await getSelfQuery({}, ctx)
-
 	const name = ctx.query.name as string
 	const community = await getCommunityByNameQuery({ name }, ctx)
 
-	if (!community) return { community: null, posts: null, selfData }
+	if (!community) return { community: null, posts: null }
 
 	const posts = await getPostsFromCommunityByIDQuery({ communityID: community.id }, ctx)
 
-	return { community, posts, selfData }
+	return { community, posts }
 }
 
 export default CommunityPage

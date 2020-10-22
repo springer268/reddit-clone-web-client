@@ -7,12 +7,11 @@ import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'
 
 interface InitialProps {
-	selfData: ShallowUser | null
 	communities: ShallowCommunity[]
 }
 
-const CommunitiesPage: NextPage<InitialProps> = ({ selfData, communities }) => {
-	const { self } = useSelf(selfData)
+const CommunitiesPage: NextPage<InitialProps> = ({ communities }) => {
+	const { self } = useSelf()
 	useIsAuth(self)
 
 	if (!self) return <Layout></Layout>
@@ -30,10 +29,9 @@ const CommunitiesPage: NextPage<InitialProps> = ({ selfData, communities }) => {
 }
 
 CommunitiesPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const selfData = await getSelfQuery({}, ctx)
 	const communities = await getCommunitiesQuery({}, ctx)
 
-	return { selfData, communities }
+	return { communities }
 }
 
 export default CommunitiesPage

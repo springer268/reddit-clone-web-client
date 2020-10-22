@@ -6,12 +6,11 @@ import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'
 
 interface InitialProps {
-	selfData: ShallowUser | null
 	posts: TotalPost[] | null
 }
 
-const ProfilePage: NextPage<InitialProps> = ({ selfData, posts }) => {
-	const { self } = useSelf(selfData)
+const ProfilePage: NextPage<InitialProps> = ({ posts }) => {
+	const { self } = useSelf()
 	useIsAuth(self)
 
 	if (!self || !posts) return <Layout></Layout>
@@ -28,10 +27,10 @@ const ProfilePage: NextPage<InitialProps> = ({ selfData, posts }) => {
 
 ProfilePage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
 	const selfData = await getSelfQuery({}, ctx)
-	if (!selfData) return { selfData, posts: null }
+	if (!selfData) return { posts: null }
 
 	const user = await getUserByNameQuery({ name: selfData.name }, ctx)
-	return { selfData, posts: user?.posts ?? null }
+	return { posts: user?.posts ?? null }
 }
 
 export default ProfilePage

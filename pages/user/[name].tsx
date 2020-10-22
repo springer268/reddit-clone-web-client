@@ -6,12 +6,11 @@ import { getSelfQuery, getUserByNameQuery } from 'util/queries'
 import { useIsAuth, useSelf } from 'hooks'
 
 interface InitialProps {
-	selfData: ShallowUser | null
 	user: CompleteUser | null
 }
 
-const UserPage: NextPage<InitialProps> = ({ user, selfData }) => {
-	const { self } = useSelf(selfData)
+const UserPage: NextPage<InitialProps> = ({ user }) => {
+	const { self } = useSelf()
 	useIsAuth(self)
 
 	if (!self) return <Layout></Layout>
@@ -35,10 +34,9 @@ const UserPage: NextPage<InitialProps> = ({ user, selfData }) => {
 }
 
 UserPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const selfData = await getSelfQuery({}, ctx)
 	const user = await getUserByNameQuery({ name: ctx.query.name as string })
 
-	return { user, selfData }
+	return { user }
 }
 
 export default UserPage

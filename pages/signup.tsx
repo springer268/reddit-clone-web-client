@@ -6,12 +6,10 @@ import { ShallowUser } from 'models'
 import { getSelfQuery } from 'util/queries'
 import { useSelf } from 'hooks'
 
-interface InitialProps {
-	selfData: ShallowUser | null
-}
+interface InitialProps {}
 
-const SignupPage: NextPage<InitialProps> = ({ selfData }) => {
-	const { self } = useSelf(selfData)
+const SignupPage: NextPage<InitialProps> = ({}) => {
+	const { self } = useSelf()
 
 	useEffect(() => {
 		if (document.cookie.length > 0) {
@@ -28,9 +26,6 @@ const SignupPage: NextPage<InitialProps> = ({ selfData }) => {
 	)
 }
 
-SignupPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const selfData = await getSelfQuery({}, ctx)
-	return { selfData }
-}
+// SignupPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {}
 
 export default SignupPage

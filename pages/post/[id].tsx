@@ -6,12 +6,11 @@ import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'
 
 interface InitialProps {
-	selfData: ShallowUser | null
 	post: TotalPost | null
 }
 
-const PostPage: NextPage<InitialProps> = ({ selfData, post }) => {
-	const { self } = useSelf(selfData)
+const PostPage: NextPage<InitialProps> = ({ post }) => {
+	const { self } = useSelf()
 	useIsAuth(self)
 
 	if (!self) return <Layout></Layout>
@@ -33,10 +32,9 @@ const PostPage: NextPage<InitialProps> = ({ selfData, post }) => {
 }
 
 PostPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const selfData = await getSelfQuery({}, ctx)
 	const post = await getPostByIDQuery({ id: ctx.query.id as string }, ctx)
 
-	return { selfData, post }
+	return { post }
 }
 
 export default PostPage

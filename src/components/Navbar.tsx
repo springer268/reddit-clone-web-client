@@ -49,6 +49,7 @@ export const Navbar: React.FC<Props> = () => {
 						<li>
 							<Link href='/logout'>Logout</Link>
 						</li>
+						<li></li>
 					</>
 				) : (
 					<>
@@ -58,6 +59,7 @@ export const Navbar: React.FC<Props> = () => {
 						<li>
 							<Link href='/signup'>Signup</Link>
 						</li>
+						<li></li>
 					</>
 				)}
 			</ul>

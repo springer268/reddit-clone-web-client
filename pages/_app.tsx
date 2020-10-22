@@ -5,6 +5,9 @@ import { createGlobalStyle } from 'styled-components'
 import { SelfContextProvider } from '../src/context'
 import { backendApolloClient } from '../src/apollo'
 import { theme } from '../src/components/ui/theme'
+import { useAwait, useSelf } from 'hooks'
+import { useEffect } from 'react'
+import { getSelfQuery } from 'util/queries'
 
 const GlobalStyles = createGlobalStyle`
 	* {
@@ -26,7 +29,22 @@ const GlobalStyles = createGlobalStyle`
 	}
 `
 
-export default function App({ Component, pageProps }: AppProps) {
+const GetSelfComponent: React.FC<{}> = () => {
+	const { setSelf } = useSelf()
+
+	useEffect(() => {
+		const main = async () => {
+			const res = await getSelfQuery({})
+			setSelf(res)
+		}
+
+		main()
+	}, [])
+
+	return <></>
+}
+
+const App = ({ Component, pageProps }: AppProps) => {
 	return (
 		<ApolloProvider client={backendApolloClient}>
 			<SelfContextProvider>
@@ -34,8 +52,11 @@ export default function App({ Component, pageProps }: AppProps) {
 					<title>Reddit</title>
 				</Head>
 				<GlobalStyles />
+				<GetSelfComponent />
 				<Component {...pageProps} />
 			</SelfContextProvider>
 		</ApolloProvider>
 	)
 }
+
+export default App

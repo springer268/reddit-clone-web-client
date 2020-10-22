@@ -5,12 +5,10 @@ import { getSelfQuery } from 'util/queries'
 import { Layout } from '../src/components'
 import { Header } from '../src/components/ui'
 
-interface InitialProps {
-	selfData: ShallowUser | null
-}
+interface InitialProps {}
 
-const Feed: NextPage<InitialProps> = ({ selfData }) => {
-	const { self } = useSelf(selfData)
+const Feed: NextPage<InitialProps> = ({}) => {
+	const { self } = useSelf()
 	useIsAuth(self)
 
 	if (!self) return <Layout></Layout>
@@ -22,9 +20,6 @@ const Feed: NextPage<InitialProps> = ({ selfData }) => {
 	)
 }
 
-Feed.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const selfData = await getSelfQuery({}, ctx)
-	return { selfData }
-}
+// Feed.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {}
 
 export default Feed

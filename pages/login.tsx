@@ -3,11 +3,9 @@ import { Layout, LoginCard } from '../src/components'
 import { getSelfQuery } from 'util/queries'
 import { ShallowUser } from 'models'
 
-interface InitialProps {
-	selfData: ShallowUser | null
-}
+interface InitialProps {}
 
-const LoginPage: NextPage<InitialProps> = ({ selfData }) => {
+const LoginPage: NextPage<InitialProps> = ({}) => {
 	return (
 		<Layout>
 			<div style={{ marginTop: '25px' }}>
@@ -17,9 +15,6 @@ const LoginPage: NextPage<InitialProps> = ({ selfData }) => {
 	)
 }
 
-LoginPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const selfData = await getSelfQuery({}, ctx)
-	return { selfData }
-}
+// LoginPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {}
 
 export default LoginPage

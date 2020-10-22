@@ -6,11 +6,9 @@ import { getSelfQuery } from 'util/queries'
 import { ShallowUser } from 'models'
 import { useSelf } from 'hooks'
 
-interface InitialProps {
-	selfData: ShallowUser | null
-}
+interface InitialProps {}
 
-const LogoutPage: NextPage<InitialProps> = ({ selfData }) => {
+const LogoutPage: NextPage<InitialProps> = ({}) => {
 	useSelf(null)
 
 	useEffect(() => {
@@ -30,9 +28,6 @@ const LogoutPage: NextPage<InitialProps> = ({ selfData }) => {
 	)
 }
 
-LogoutPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const selfData = await getSelfQuery({}, ctx)
-	return { selfData }
-}
+// LogoutPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {}
 
 export default LogoutPage
