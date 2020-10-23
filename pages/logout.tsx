@@ -4,9 +4,7 @@ import { Layout } from 'components'
 import { Header } from 'components/ui'
 import { useSelf } from 'hooks'
 
-interface InitialProps {}
-
-const LogoutPage: NextPage<InitialProps> = ({}) => {
+const LogoutPage: NextPage = () => {
 	useSelf(null)
 
 	useEffect(() => {
@@ -25,7 +23,5 @@ const LogoutPage: NextPage<InitialProps> = ({}) => {
 		</Layout>
 	)
 }
-
-// LogoutPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {}
 
 export default LogoutPage

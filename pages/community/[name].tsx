@@ -1,20 +1,15 @@
 import { useRef, useState } from 'react'
-import { NextPage, NextPageContext } from 'next'
-import { ShallowCommunity, TotalPost } from 'models'
+import { NextPage } from 'next'
 import { Layout, AddPostCard, PostCard } from 'components'
-import { Header, Button } from 'components/ui'
+import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'
-import { concatPagination } from '@apollo/client/utilities'
-import {
-	GetCommunityByNameQuery,
-	GetCommunityWithTotalPostsByNameQuery,
-	useGetCommunityWithTotalPostsByNameQuery
-} from 'gen'
+import { useGetCommunityWithTotalPostsByNameQuery } from 'gen'
 import { useRouter } from 'next/router'
+import InfiniteScroll from 'react-infinite-scroller'
 
 interface InitialProps {}
 
-const AMOUNT = 2
+const AMOUNT = 5
 
 const CommunityPage: NextPage<InitialProps> = () => {
 	const router = useRouter()
@@ -43,43 +38,39 @@ const CommunityPage: NextPage<InitialProps> = () => {
 		<Layout>
 			<Header>{community.name}</Header>
 			<div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr' }}>
-				<div>
+				<InfiniteScroll
+					pageStart={0}
+					hasMore={areMorePosts}
+					loadMore={async () => {
+						await fetchMore({
+							variables: { amount: AMOUNT, offset: offset.current },
+							//@ts-ignore
+							updateQuery: (prevResult, { fetchMoreResult }) => {
+								if (
+									!fetchMoreResult?.GetCommunityByName ||
+									!prevResult.GetCommunityByName ||
+									fetchMoreResult.GetCommunityByName.posts.length === 0
+								) {
+									setAreMorePosts(false)
+									return prevResult
+								}
+
+								fetchMoreResult.GetCommunityByName.posts = [
+									...prevResult.GetCommunityByName.posts,
+									...fetchMoreResult.GetCommunityByName.posts
+								]
+
+								offset.current += AMOUNT
+
+								return fetchMoreResult
+							}
+						})
+					}}
+				>
 					{community.posts.map(post => (
 						<PostCard post={post} key={post.id} />
 					))}
-					{areMorePosts && (
-						<Button
-							onClick={async () => {
-								console.log(offset.current)
-								await fetchMore({
-									variables: { amount: AMOUNT, offset: offset.current },
-									//@ts-ignore
-									updateQuery: (prevResult, { fetchMoreResult }) => {
-										if (
-											!fetchMoreResult?.GetCommunityByName ||
-											!prevResult.GetCommunityByName ||
-											fetchMoreResult.GetCommunityByName.posts.length === 0
-										) {
-											setAreMorePosts(false)
-											return prevResult
-										}
-
-										fetchMoreResult.GetCommunityByName.posts = [
-											...prevResult.GetCommunityByName.posts,
-											...fetchMoreResult.GetCommunityByName.posts
-										]
-
-										offset.current += AMOUNT
-
-										return fetchMoreResult
-									}
-								})
-							}}
-						>
-							Load more
-						</Button>
-					)}
-				</div>
+				</InfiniteScroll>
 				<div style={{ margin: '0 0 0 20px' }}>
 					<AddPostCard community={community} self={self} />
 				</div>

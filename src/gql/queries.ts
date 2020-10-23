@@ -1,19 +1,9 @@
 import { NextPageContext } from 'next'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
-import { GetPostByIdQuery, GetPostByIdQueryVariables, GetPostByIdDocument } from '../gen'
 import { DocumentNode } from 'graphql'
 import { backendApolloClient } from 'apollo'
-import {
-	GetSelfQuery,
-	GetSelfQueryVariables,
-	GetSelfDocument,
-	GetCommunityByNameQuery,
-	GetCommunityByNameDocument,
-	GetCommunitiesQuery,
-	GetCommunitiesQueryVariables,
-	GetCommunitiesDocument
-} from '../gen'
-import { ShallowUser, CompleteUser, TotalPost, ShallowCommunity } from 'models'
+import { GetSelfQuery, GetSelfQueryVariables, GetSelfDocument } from 'gen'
+import { ShallowUser } from 'models'
 import { createHttpLink } from '@apollo/react-hooks'
 
 const queryBuilder = <T, U, V>(document: DocumentNode) => {
@@ -51,9 +41,3 @@ const queryBuilder = <T, U, V>(document: DocumentNode) => {
 }
 
 export const getSelfQuery = queryBuilder<GetSelfQuery, GetSelfQueryVariables, ShallowUser | null>(GetSelfDocument)
-export const getPostByIDQuery = queryBuilder<GetPostByIdQuery, GetPostByIdQueryVariables, TotalPost | null>(
-	GetPostByIdDocument
-)
-export const getCommunitiesQuery = queryBuilder<GetCommunitiesQuery, GetCommunitiesQueryVariables, ShallowCommunity[]>(
-	GetCommunitiesDocument
-)

@@ -3,9 +3,7 @@ import { NextPage, NextPageContext } from 'next'
 import { Layout } from 'components'
 import { Header } from 'components/ui'
 
-interface InitialProps {}
-
-const Feed: NextPage<InitialProps> = ({}) => {
+const Feed: NextPage = () => {
 	const { self } = useSelf()
 	useIsAuth(self)
 
@@ -17,7 +15,5 @@ const Feed: NextPage<InitialProps> = ({}) => {
 		</Layout>
 	)
 }
-
-// Feed.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {}
 
 export default Feed

@@ -1,19 +1,19 @@
-import { TotalPost } from 'models'
-import { NextPage, NextPageContext } from 'next'
-import { getPostByIDQuery } from 'gql'
+import { NextPage } from 'next'
 import { Layout } from 'components'
 import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'
+import { useRouter } from 'next/router'
+import { useGetPostByIdQuery } from 'gen'
 
-interface InitialProps {
-	post: TotalPost | null
-}
-
-const PostPage: NextPage<InitialProps> = ({ post }) => {
+const PostPage: NextPage = () => {
 	const { self } = useSelf()
 	useIsAuth(self)
+	const router = useRouter()
+	const { data } = useGetPostByIdQuery({ variables: { id: router.query.id as string } })
 
-	if (!self) return <Layout></Layout>
+	if (!self || !data?.GetPostByID) return <Layout></Layout>
+
+	const post = data.GetPostByID
 
 	if (!post) {
 		return (
@@ -29,12 +29,6 @@ const PostPage: NextPage<InitialProps> = ({ post }) => {
 			<p>{post.content}</p>
 		</Layout>
 	)
-}
-
-PostPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const post = await getPostByIDQuery({ id: ctx.query.id as string }, ctx)
-
-	return { post }
 }
 
 export default PostPage

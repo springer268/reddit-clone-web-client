@@ -1,20 +1,18 @@
-import { ShallowCommunity } from 'models'
-import { NextPage, NextPageContext } from 'next'
+import { NextPage } from 'next'
 import Link from 'next/link'
-import { getCommunitiesQuery } from 'gql'
 import { Layout } from 'components'
 import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'
+import { useGetCommunitiesQuery } from 'gen'
 
-interface InitialProps {
-	communities: ShallowCommunity[]
-}
-
-const CommunitiesPage: NextPage<InitialProps> = ({ communities }) => {
+const CommunitiesPage: NextPage = () => {
 	const { self } = useSelf()
 	useIsAuth(self)
+	const { data } = useGetCommunitiesQuery()
 
-	if (!self) return <Layout></Layout>
+	if (!self || !data?.GetCommunities) return <Layout></Layout>
+
+	const communities = data.GetCommunities
 
 	return (
 		<Layout>
@@ -26,12 +24,6 @@ const CommunitiesPage: NextPage<InitialProps> = ({ communities }) => {
 			))}
 		</Layout>
 	)
-}
-
-CommunitiesPage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const communities = await getCommunitiesQuery({}, ctx)
-
-	return { communities }
 }
 
 export default CommunitiesPage

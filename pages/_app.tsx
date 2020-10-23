@@ -7,7 +7,7 @@ import { backendApolloClient } from 'apollo'
 import { theme } from 'components/ui/theme'
 import { useSelf } from 'hooks'
 import { useEffect } from 'react'
-import { getSelfQuery } from 'gql/queries'
+import { getSelfQuery } from 'gql'
 
 const GlobalStyles = createGlobalStyle`
 	* {
@@ -26,6 +26,22 @@ const GlobalStyles = createGlobalStyle`
 	body {
 		background-color: ${theme.bg_primary};
 		color: ${theme.text_primary};
+
+		&::-webkit-scrollbar-track {
+			box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+			background-color: ${theme.bg_secondary};
+		}
+
+		&::-webkit-scrollbar {
+			width: 12px;
+			background-color: #000;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			border-radius: 10px;
+			box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+			background-color: #555;
+		}
 	}
 `
 

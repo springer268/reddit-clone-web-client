@@ -1,5 +1,4 @@
 import { useSelf } from 'hooks'
-import { ShallowUser } from 'models'
 import Link from 'next/link'
 import styled from 'styled-components'
 import { theme } from './ui/theme'

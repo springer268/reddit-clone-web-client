@@ -2,7 +2,7 @@ import Link from 'next/link'
 import styled from 'styled-components'
 import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { TotalPost } from '../models'
+import { TotalPost } from 'models'
 import { Card } from './ui'
 import { theme } from './ui/theme'
 
