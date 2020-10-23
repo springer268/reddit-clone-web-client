@@ -1,36 +1,64 @@
+import { useRef } from 'react'
 import { NextPage, NextPageContext } from 'next'
-import { getSelfQuery, getUserByNameQuery } from 'util/queries'
-import { TotalPost } from 'models'
 import { Layout, PostCard } from 'components'
-import { Header } from 'components/ui'
+import { Header, Button } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'
+import { useGetUserByNameWithTotalPostsQuery } from 'gen'
 
-interface InitialProps {
-	posts: TotalPost[] | null
-}
+interface InitialProps {}
 
-const ProfilePage: NextPage<InitialProps> = ({ posts }) => {
+const AMOUNT = 1
+
+const ProfilePage: NextPage<InitialProps> = ({}) => {
 	const { self } = useSelf()
+	const offsetRef = useRef(AMOUNT)
 	useIsAuth(self)
 
-	if (!self || !posts) return <Layout></Layout>
+	const { data, fetchMore } = useGetUserByNameWithTotalPostsQuery({
+		variables: { name: self?.name ?? '', amount: AMOUNT, offset: 0 }
+	})
+
+	if (!self || !data?.GetUserByNameWithTotalPosts) return <Layout></Layout>
+
+	const selfData = data.GetUserByNameWithTotalPosts
 
 	return (
 		<Layout>
 			<Header>{`Your Profile: ${self.name}`}</Header>
-			{posts.map(post => (
+			{selfData.posts.map(post => (
 				<PostCard post={post} key={post.id} />
 			))}
+			<Button
+				onClick={async () => {
+					await fetchMore({
+						variables: { amount: AMOUNT, offset: offsetRef.current },
+						//@ts-ignore
+						updateQuery: (prevResult, { fetchMoreResult }) => {
+							if (
+								!prevResult.GetUserByNameWithTotalPosts ||
+								!fetchMoreResult?.GetUserByNameWithTotalPosts
+							) {
+								return prevResult
+							}
+
+							fetchMoreResult.GetUserByNameWithTotalPosts.posts = [
+								...prevResult.GetUserByNameWithTotalPosts.posts,
+								...fetchMoreResult.GetUserByNameWithTotalPosts.posts
+							]
+
+							offsetRef.current += AMOUNT
+
+							return fetchMoreResult
+						}
+					})
+				}}
+			>
+				Load More
+			</Button>
 		</Layout>
 	)
 }
 
-ProfilePage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {
-	const selfData = await getSelfQuery({}, ctx)
-	if (!selfData) return { posts: null }
-
-	const user = await getUserByNameQuery({ name: selfData.name }, ctx)
-	return { posts: user?.posts ?? null }
-}
+// ProfilePage.getInitialProps = async (ctx: NextPageContext): Promise<InitialProps> => {}
 
 export default ProfilePage

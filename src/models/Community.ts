@@ -1,3 +1,3 @@
-import { Community as ICommunity } from '../generated'
+import { Community as ICommunity } from 'gen'
 
-export interface ShallowCommunity extends ICommunity {}
+export interface ShallowCommunity extends Omit<ICommunity, 'posts'> {}

@@ -1,7 +1,7 @@
 import Router from 'next/router'
 import { Card, Input, ErrorMessage, Button, CardWrapper, Header } from './ui'
 import { Formik } from 'formik'
-import { useAttemptLoginMutation } from 'generated'
+import { useAttemptLoginMutation } from '../gen'
 import { useContext } from 'react'
 import { SelfContext } from 'context'
 import { ShallowUser } from 'models'

@@ -1,7 +1,7 @@
 import { ShallowCommunity } from 'models'
 import { NextPage, NextPageContext } from 'next'
 import Link from 'next/link'
-import { getCommunitiesQuery, getSelfQuery } from 'util/queries'
+import { getCommunitiesQuery } from 'gql'
 import { Layout } from 'components'
 import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'

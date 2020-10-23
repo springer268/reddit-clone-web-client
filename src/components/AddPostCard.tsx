@@ -2,7 +2,7 @@ import Router from 'next/router'
 import { Formik } from 'formik'
 import { Card, Header, CardWrapper, Input, Button, ErrorMessage } from './ui'
 import { ShallowCommunity, ShallowUser } from '../models'
-import { useAddPostMutation } from 'generated'
+import { useAddPostMutation } from '../gen'
 
 interface Props {
 	community: ShallowCommunity

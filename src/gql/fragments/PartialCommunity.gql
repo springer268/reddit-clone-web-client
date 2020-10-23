@@ -1,5 +1,0 @@
-fragment PartialCommunity on Community {
-	id
-	name
-	followerCount
-}

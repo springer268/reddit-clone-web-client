@@ -1,4 +1,4 @@
-import { Post as IPost } from '../generated'
+import { Post as IPost } from 'gen'
 import { ShallowUser, ShallowCommunity } from 'models'
 
 export interface ShallowPost extends Omit<IPost, 'author' | 'community'> {}

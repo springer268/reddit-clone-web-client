@@ -1,6 +1,0 @@
-fragment CompleteUser on User {
-	...PartialUser
-	posts {
-		...TotalPost
-	}
-}

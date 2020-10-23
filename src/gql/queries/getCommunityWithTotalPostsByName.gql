@@ -1,0 +1,8 @@
+query GetCommunityWithTotalPostsByName($name: String!, $amount: Float!, $offset: Float!) {
+	GetCommunityByName(name: $name) {
+		...ShallowCommunity
+		posts(amount: $amount, offset: $offset) {
+			...TotalPost
+		}
+	}
+}

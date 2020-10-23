@@ -1,5 +1,5 @@
 mutation AddUser($name: String!, $password: String!) {
 	AddUser(name: $name, password: $password) {
-		id
+		...ShallowUser
 	}
 }

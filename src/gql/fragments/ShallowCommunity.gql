@@ -1,0 +1,5 @@
+fragment ShallowCommunity on Community {
+	id
+	name
+	followerCount
+}

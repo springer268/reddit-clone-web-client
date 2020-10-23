@@ -5,6 +5,8 @@ import styled from 'styled-components'
 import { theme } from './ui/theme'
 
 const NavUI = styled.nav`
+	position: sticky;
+	top: 0;
 	height: 48px;
 	background: ${theme.bg_secondary};
 	border-bottom: 1px solid ${theme.bg_border_lazy};

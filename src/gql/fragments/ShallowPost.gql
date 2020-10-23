@@ -1,4 +1,4 @@
-fragment PartialPost on Post {
+fragment ShallowPost on Post {
 	id
 	title
 	content

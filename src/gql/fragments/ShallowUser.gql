@@ -1,4 +1,4 @@
-fragment PartialUser on User {
+fragment ShallowUser on User {
 	id
 	name
 	email

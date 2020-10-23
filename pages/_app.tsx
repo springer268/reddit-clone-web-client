@@ -7,7 +7,7 @@ import { backendApolloClient } from 'apollo'
 import { theme } from 'components/ui/theme'
 import { useSelf } from 'hooks'
 import { useEffect } from 'react'
-import { getSelfQuery } from 'util/queries'
+import { getSelfQuery } from 'gql/queries'
 
 const GlobalStyles = createGlobalStyle`
 	* {

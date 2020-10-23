@@ -1,0 +1,8 @@
+query GetUserByNameWithTotalPosts($name: String!, $amount: Float!, $offset: Float!) {
+	GetUserByNameWithTotalPosts(name: $name) {
+		...ShallowUser
+		posts(amount: $amount, offset: $offset) {
+			...TotalPost
+		}
+	}
+}

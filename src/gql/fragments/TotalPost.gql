@@ -1,9 +1,9 @@
 fragment TotalPost on Post {
-	...PartialPost
+	...ShallowPost
 	author {
-		...PartialUser
+		...ShallowUser
 	}
 	community {
-		...PartialCommunity
+		...ShallowCommunity
 	}
 }

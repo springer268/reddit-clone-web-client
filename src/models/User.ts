@@ -1,4 +1,4 @@
-import { User as IUser } from '../generated'
+import { User as IUser } from 'gen'
 import { TotalPost } from '.'
 
 export interface ShallowUser extends Omit<IUser, 'posts'> {}

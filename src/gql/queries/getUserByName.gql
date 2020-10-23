@@ -1,5 +1,0 @@
-query GetUserByName($name: String!) {
-	GetUserByName(name: $name) {
-		...CompleteUser
-	}
-}

@@ -7,6 +7,7 @@ const link = createHttpLink({
 
 export const backendApolloClient = new ApolloClient({
 	cache: new InMemoryCache(),
+	/*
 	defaultOptions: {
 		watchQuery: {
 			fetchPolicy: 'no-cache',
@@ -17,5 +18,6 @@ export const backendApolloClient = new ApolloClient({
 			errorPolicy: 'all'
 		}
 	},
+	*/
 	link
 })
