@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Layout } from 'components'
 import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'
-import { useGetCommunitiesQuery } from 'gen'
+import { useGetCommunitiesQuery } from 'gql'
 
 const CommunitiesPage: NextPage = () => {
 	const { self } = useSelf()

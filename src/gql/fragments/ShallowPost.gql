@@ -1,7 +1,0 @@
-fragment ShallowPost on Post {
-	id
-	title
-	content
-	upvotes
-	downvotes
-}

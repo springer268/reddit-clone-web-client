@@ -3,7 +3,7 @@ import { NextPage } from 'next'
 import { Layout, AddPostCard, PostCard } from 'components'
 import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'
-import { useGetCommunityWithTotalPostsByNameQuery } from 'gen'
+import { useGetCommunityWithPostsByNameQuery } from 'gql'
 import { useRouter } from 'next/router'
 import InfiniteScroll from 'react-infinite-scroller'
 
@@ -18,21 +18,20 @@ const CommunityPage: NextPage<InitialProps> = () => {
 	const offset = useRef(AMOUNT)
 	useIsAuth(self)
 
-	const { data, fetchMore } = useGetCommunityWithTotalPostsByNameQuery({
+	const { data, fetchMore, loading } = useGetCommunityWithPostsByNameQuery({
 		variables: { name: router.query.name as string, amount: AMOUNT, offset: 0 }
 	})
 
-	if (!data || !self) return <Layout></Layout>
-
-	const community = data.GetCommunityByName
-
-	if (!community) {
+	if (!self || loading) return <Layout></Layout>
+	else if (!data) {
 		return (
 			<Layout>
 				<Header>Community does not exist</Header>
 			</Layout>
 		)
 	}
+
+	const community = data.GetCommunityByName
 
 	return (
 		<Layout>

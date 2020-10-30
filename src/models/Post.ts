@@ -1,9 +1,4 @@
-import { Post as IPost } from 'gen'
-import { ShallowUser, ShallowCommunity } from 'models'
+import { PostFragment, GetPostWithCommentsByIdQuery } from 'gql'
 
-export interface ShallowPost extends Omit<IPost, 'author' | 'community'> {}
-
-export interface TotalPost extends ShallowPost {
-	author: ShallowUser
-	community: ShallowCommunity
-}
+export type Post = PostFragment
+export type PostWithComments = GetPostWithCommentsByIdQuery['GetPostByID']

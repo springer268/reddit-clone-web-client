@@ -1,5 +1,5 @@
 mutation AttemptLogin($name: String!, $password: String!) {
 	AttemptLogin(name: $name, password: $password) {
-		...ShallowUser
+		...User
 	}
 }

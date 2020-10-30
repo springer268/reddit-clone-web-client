@@ -1,0 +1,5 @@
+fragment Community on Community {
+	id
+	name
+	followerCount
+}

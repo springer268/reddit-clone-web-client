@@ -1,8 +1,4 @@
-import { User as IUser } from 'gen'
-import { TotalPost } from '.'
+import { UserFragment, GetUserByNameWithPostsQuery } from 'gql'
 
-export interface ShallowUser extends Omit<IUser, 'posts'> {}
-
-export interface CompleteUser extends ShallowUser {
-	posts: TotalPost[]
-}
+export type User = UserFragment
+export type UserWithPosts = GetUserByNameWithPostsQuery['GetUserByName']

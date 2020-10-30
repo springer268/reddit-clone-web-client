@@ -4,7 +4,7 @@ import { NextPage } from 'next'
 import { Layout, PostCard } from 'components'
 import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'
-import { useGetUserByNameWithTotalPostsQuery } from 'gen'
+import { useGetUserByNameWithPostsQuery } from 'gql'
 import InfiniteScroll from 'react-infinite-scroller'
 
 const FETCH_AMOUNT = 10
@@ -15,13 +15,13 @@ const ProfilePage: NextPage = () => {
 	const offsetRef = useRef(FETCH_AMOUNT)
 	useIsAuth(self)
 
-	const { data, fetchMore } = useGetUserByNameWithTotalPostsQuery({
+	const { data, fetchMore } = useGetUserByNameWithPostsQuery({
 		variables: { name: self?.name ?? '', amount: FETCH_AMOUNT, offset: 0 }
 	})
 
-	if (!self || !data?.GetUserByNameWithTotalPosts) return <Layout></Layout>
+	if (!self || !data?.GetUserByName) return <Layout></Layout>
 
-	const selfData = data.GetUserByNameWithTotalPosts
+	const selfData = data.GetUserByName
 
 	return (
 		<Layout>
@@ -33,17 +33,14 @@ const ProfilePage: NextPage = () => {
 					await fetchMore({
 						variables: { amount: FETCH_AMOUNT, offset: offsetRef.current },
 						updateQuery: (prevResult, { fetchMoreResult }) => {
-							if (
-								!prevResult.GetUserByNameWithTotalPosts ||
-								!fetchMoreResult?.GetUserByNameWithTotalPosts
-							) {
+							if (!prevResult.GetUserByName || !fetchMoreResult?.GetUserByName) {
 								setHasMore(false)
 								return prevResult
 							}
 
-							fetchMoreResult.GetUserByNameWithTotalPosts.posts = [
-								...prevResult.GetUserByNameWithTotalPosts.posts,
-								...fetchMoreResult.GetUserByNameWithTotalPosts.posts
+							fetchMoreResult.GetUserByName.posts = [
+								...prevResult.GetUserByName.posts,
+								...fetchMoreResult.GetUserByName.posts
 							]
 
 							offsetRef.current += FETCH_AMOUNT

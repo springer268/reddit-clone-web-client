@@ -1,8 +1,8 @@
 import { createContext, Dispatch, FC, SetStateAction, useState } from 'react'
-import { ShallowUser } from '../models'
+import { User } from '../models'
 
 interface ISelfContext {
-	self: ShallowUser | null
+	self: User | null
 	setSelf: Dispatch<SetStateAction<ISelfContext['self']>>
 }
 

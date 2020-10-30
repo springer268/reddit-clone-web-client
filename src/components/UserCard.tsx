@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { ShallowUser } from 'models'
+import { User } from 'models'
 import { Card, Header } from './ui'
 
 const Style = styled.div`
@@ -12,7 +12,7 @@ const Style = styled.div`
 `
 
 interface Props {
-	user: ShallowUser
+	user: User
 }
 
 export const UserCard: React.FC<Props> = ({ user }) => {

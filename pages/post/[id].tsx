@@ -1,21 +1,22 @@
 import { NextPage } from 'next'
-import { Layout } from 'components'
+import { CommentSection, Layout } from 'components'
 import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'
 import { useRouter } from 'next/router'
-import { useGetPostByIdQuery } from 'gen'
+import { useGetPostWithCommentsByIdQuery } from 'gql'
+
+const FETCH_COMMENT_AMOUNT = 5
 
 const PostPage: NextPage = () => {
 	const { self } = useSelf()
 	useIsAuth(self)
 	const router = useRouter()
-	const { data } = useGetPostByIdQuery({ variables: { id: router.query.id as string } })
+	const { data, loading } = useGetPostWithCommentsByIdQuery({
+		variables: { id: router.query.id as string, amount: FETCH_COMMENT_AMOUNT, offset: 0 }
+	})
 
-	if (!self || !data?.GetPostByID) return <Layout></Layout>
-
-	const post = data.GetPostByID
-
-	if (!post) {
+	if (!self || loading) return <Layout></Layout>
+	else if (!data) {
 		return (
 			<Layout>
 				<Header>No post found</Header>
@@ -23,10 +24,13 @@ const PostPage: NextPage = () => {
 		)
 	}
 
+	const post = data.GetPostByID
+
 	return (
 		<Layout>
 			<Header>{post.title}</Header>
 			<p>{post.content}</p>
+			<CommentSection post={post} />
 		</Layout>
 	)
 }

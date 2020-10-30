@@ -1,0 +1,8 @@
+query GetUserByNameWithPosts($name: String!, $amount: Float!, $offset: Float!) {
+	GetUserByName(name: $name) {
+		...User
+		posts(amount: $amount, offset: $offset) {
+			...Post
+		}
+	}
+}

@@ -1,9 +1,0 @@
-fragment TotalPost on Post {
-	...ShallowPost
-	author {
-		...ShallowUser
-	}
-	community {
-		...ShallowCommunity
-	}
-}

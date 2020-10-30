@@ -1,5 +1,5 @@
 query GetCommunityByName($name: String!) {
 	GetCommunityByName(name: $name) {
-		...ShallowCommunity
+		...Community
 	}
 }

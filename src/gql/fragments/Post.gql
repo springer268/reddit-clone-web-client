@@ -1,0 +1,13 @@
+fragment Post on Post {
+	id
+	title
+	content
+	upvotes
+	downvotes
+	author {
+		...User
+	}
+	community {
+		...Community
+	}
+}

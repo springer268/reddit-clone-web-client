@@ -4,26 +4,33 @@ import { NextPage } from 'next'
 import { Layout, PostCard } from 'components'
 import { Header } from 'components/ui'
 import { useIsAuth, useSelf } from 'hooks'
-import { useGetUserByNameWithTotalPostsQuery } from 'gen'
+import { useGetUserByNameWithPostsQuery } from 'gql'
 import InfiniteScroll from 'react-infinite-scroller'
 import { useRouter } from 'next/router'
 
-const AMOUNT = 10
+const FETCH_AMOUNT = 10
 
 const UserPage: NextPage = () => {
 	const { self } = useSelf()
 	const router = useRouter()
 	const [hasMore, setHasMore] = useState(true)
-	const offsetRef = useRef(AMOUNT)
+	const offsetRef = useRef(FETCH_AMOUNT)
 	useIsAuth(self)
 
-	const { data, fetchMore } = useGetUserByNameWithTotalPostsQuery({
-		variables: { name: router.query.name as string, amount: AMOUNT, offset: 0 }
+	const { data, loading, fetchMore } = useGetUserByNameWithPostsQuery({
+		variables: { name: router.query.name as string, amount: FETCH_AMOUNT, offset: 0 }
 	})
 
-	if (!self || !data?.GetUserByNameWithTotalPosts) return <Layout></Layout>
+	if (!self || loading) return <Layout></Layout>
+	else if (!data) {
+		return (
+			<Layout>
+				<Header>User does not exist</Header>
+			</Layout>
+		)
+	}
 
-	const user = data.GetUserByNameWithTotalPosts
+	const user = data.GetUserByName
 
 	return (
 		<Layout>
@@ -33,22 +40,19 @@ const UserPage: NextPage = () => {
 				hasMore={hasMore}
 				loadMore={async () => {
 					await fetchMore({
-						variables: { amount: AMOUNT, offset: offsetRef.current },
+						variables: { amount: FETCH_AMOUNT, offset: offsetRef.current },
 						updateQuery: (prevResult, { fetchMoreResult }) => {
-							if (
-								!prevResult.GetUserByNameWithTotalPosts ||
-								!fetchMoreResult?.GetUserByNameWithTotalPosts
-							) {
+							if (!prevResult.GetUserByName || !fetchMoreResult?.GetUserByName) {
 								setHasMore(false)
 								return prevResult
 							}
 
-							fetchMoreResult.GetUserByNameWithTotalPosts.posts = [
-								...prevResult.GetUserByNameWithTotalPosts.posts,
-								...fetchMoreResult.GetUserByNameWithTotalPosts.posts
+							fetchMoreResult.GetUserByName.posts = [
+								...prevResult.GetUserByName.posts,
+								...fetchMoreResult.GetUserByName.posts
 							]
 
-							offsetRef.current += AMOUNT
+							offsetRef.current += FETCH_AMOUNT
 
 							return fetchMoreResult
 						}

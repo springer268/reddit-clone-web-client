@@ -1,0 +1,11 @@
+query GetPostWithCommentsByID($id: String!, $amount: Float!, $offset: Float!) {
+	GetPostByID(id: $id) {
+		...Post
+		comments(amount: $amount, offset: $offset) {
+			...Comment
+			parent {
+				...Comment
+			}
+		}
+	}
+}

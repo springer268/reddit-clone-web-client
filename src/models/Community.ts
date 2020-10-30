@@ -1,3 +1,4 @@
-import { Community as ICommunity } from 'gen'
+import { CommunityFragment, GetCommunityWithPostsByNameQuery } from 'gql'
 
-export interface ShallowCommunity extends Omit<ICommunity, 'posts'> {}
+export type Community = CommunityFragment
+export type CommunityWithPosts = GetCommunityWithPostsByNameQuery['GetCommunityByName']

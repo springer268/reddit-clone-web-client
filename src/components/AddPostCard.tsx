@@ -1,12 +1,12 @@
 import Router from 'next/router'
 import { Formik } from 'formik'
 import { Card, Header, CardWrapper, Input, Button, ErrorMessage } from './ui'
-import { ShallowCommunity, ShallowUser } from 'models'
-import { useAddPostMutation } from 'gen'
+import { Community, User } from 'models'
+import { useAddPostMutation } from 'gql'
 
 interface Props {
-	community: ShallowCommunity
-	self: ShallowUser
+	community: Community
+	self: User
 }
 
 export const AddPostCard: React.FC<Props> = ({ community, self: user }) => {

@@ -1,0 +1,9 @@
+fragment Comment on Comment {
+	id
+	content
+	upvotes
+	downvotes
+	author {
+		...User
+	}
+}

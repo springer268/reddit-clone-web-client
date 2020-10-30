@@ -1,7 +1,7 @@
 import { Card, CardWrapper, ErrorMessage, Input, Button, Header } from './ui'
 import { Formik } from 'formik'
 import Router from 'next/router'
-import { useAddUserMutation, useAttemptLoginMutation } from 'gen'
+import { useAddUserMutation, useAttemptLoginMutation } from 'gql'
 
 interface Props {}
 

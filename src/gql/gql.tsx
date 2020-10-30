@@ -15,14 +15,16 @@ export type Scalars = {
 export type Query = {
   __typename?: 'Query';
   GetSelf?: Maybe<User>;
-  GetUserByID?: Maybe<User>;
-  GetUserByNameWithTotalPosts?: Maybe<User>;
-  GetPostByID?: Maybe<Post>;
+  GetUserByID: User;
+  GetUserByName: User;
+  GetPostByID: Post;
   GetCommunityByID?: Maybe<Community>;
-  GetCommunityByName?: Maybe<Community>;
+  GetCommunityByName: Community;
   GetCommunities: Array<Community>;
-  GetPostsFromCommunityByID?: Maybe<Array<Post>>;
-  GetPostsFromCommunityByName?: Maybe<Array<Post>>;
+  GetCommentByID: Comment;
+  GetCommentsFromPostByID: Array<Comment>;
+  GetCommentsFromUserByID: Array<Comment>;
+  GetCommentsFromUserByName: Array<Comment>;
 };
 
 
@@ -31,7 +33,7 @@ export type QueryGetUserByIdArgs = {
 };
 
 
-export type QueryGetUserByNameWithTotalPostsArgs = {
+export type QueryGetUserByNameArgs = {
   name: Scalars['String'];
 };
 
@@ -51,15 +53,27 @@ export type QueryGetCommunityByNameArgs = {
 };
 
 
-export type QueryGetPostsFromCommunityByIdArgs = {
-  offset: Scalars['Float'];
-  amount: Scalars['Float'];
-  communityID: Scalars['String'];
+export type QueryGetCommentByIdArgs = {
+  id: Scalars['String'];
 };
 
 
-export type QueryGetPostsFromCommunityByNameArgs = {
-  offset: Scalars['Float'];
+export type QueryGetCommentsFromPostByIdArgs = {
+  offset?: Maybe<Scalars['Float']>;
+  amount: Scalars['Float'];
+  postID: Scalars['String'];
+};
+
+
+export type QueryGetCommentsFromUserByIdArgs = {
+  offset?: Maybe<Scalars['Float']>;
+  amount: Scalars['Float'];
+  userID: Scalars['String'];
+};
+
+
+export type QueryGetCommentsFromUserByNameArgs = {
+  offset?: Maybe<Scalars['Float']>;
   amount: Scalars['Float'];
   name: Scalars['String'];
 };
@@ -71,6 +85,8 @@ export type User = {
   email: Scalars['String'];
   description: Scalars['String'];
   posts: Array<Post>;
+  comments: Array<Comment>;
+  comunities: Array<Community>;
 };
 
 
@@ -79,15 +95,34 @@ export type UserPostsArgs = {
   amount: Scalars['Float'];
 };
 
+
+export type UserCommentsArgs = {
+  offset?: Maybe<Scalars['Float']>;
+  amount: Scalars['Float'];
+};
+
+
+export type UserComunitiesArgs = {
+  offset?: Maybe<Scalars['Float']>;
+  amount: Scalars['Float'];
+};
+
 export type Post = {
   __typename?: 'Post';
   id: Scalars['ID'];
-  author: User;
   title: Scalars['String'];
   content: Scalars['String'];
-  community: Community;
   upvotes: Scalars['Int'];
   downvotes: Scalars['Int'];
+  community: Community;
+  author: User;
+  comments: Array<Comment>;
+};
+
+
+export type PostCommentsArgs = {
+  offset?: Maybe<Scalars['Float']>;
+  amount: Scalars['Float'];
 };
 
 export type Community = {
@@ -104,13 +139,27 @@ export type CommunityPostsArgs = {
   amount: Scalars['Float'];
 };
 
+export type Comment = {
+  __typename?: 'Comment';
+  id: Scalars['String'];
+  content: Scalars['String'];
+  upvotes: Scalars['Int'];
+  downvotes: Scalars['Int'];
+  author: User;
+  parent?: Maybe<Comment>;
+  replies: Array<Comment>;
+  post: Post;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   AttemptLogin: User;
   AddUser: User;
   AddPost: Post;
-  DeletePostByID: Scalars['Boolean'];
   AddCommunityByName: Community;
+  AddCommentToPost: Comment;
+  FollowCommunity: Scalars['Boolean'];
+  UnfollowCommunity: Scalars['Boolean'];
 };
 
 
@@ -134,40 +183,59 @@ export type MutationAddPostArgs = {
 };
 
 
-export type MutationDeletePostByIdArgs = {
-  id: Scalars['String'];
-};
-
-
 export type MutationAddCommunityByNameArgs = {
   name: Scalars['String'];
 };
 
-export type ShallowCommunityFragment = (
+
+export type MutationAddCommentToPostArgs = {
+  parentID?: Maybe<Scalars['String']>;
+  postID: Scalars['String'];
+  authorID: Scalars['String'];
+  content: Scalars['String'];
+};
+
+
+export type MutationFollowCommunityArgs = {
+  communityID: Scalars['String'];
+  userID: Scalars['String'];
+};
+
+
+export type MutationUnfollowCommunityArgs = {
+  communityID: Scalars['String'];
+  userID: Scalars['String'];
+};
+
+export type CommentFragment = (
+  { __typename?: 'Comment' }
+  & Pick<Comment, 'id' | 'content' | 'upvotes' | 'downvotes'>
+  & { author: (
+    { __typename?: 'User' }
+    & UserFragment
+  ) }
+);
+
+export type CommunityFragment = (
   { __typename?: 'Community' }
   & Pick<Community, 'id' | 'name' | 'followerCount'>
 );
 
-export type ShallowPostFragment = (
+export type PostFragment = (
   { __typename?: 'Post' }
   & Pick<Post, 'id' | 'title' | 'content' | 'upvotes' | 'downvotes'>
-);
-
-export type ShallowUserFragment = (
-  { __typename?: 'User' }
-  & Pick<User, 'id' | 'name' | 'email' | 'description'>
-);
-
-export type TotalPostFragment = (
-  { __typename?: 'Post' }
   & { author: (
     { __typename?: 'User' }
-    & ShallowUserFragment
+    & UserFragment
   ), community: (
     { __typename?: 'Community' }
-    & ShallowCommunityFragment
+    & CommunityFragment
   ) }
-  & ShallowPostFragment
+);
+
+export type UserFragment = (
+  { __typename?: 'User' }
+  & Pick<User, 'id' | 'name' | 'email' | 'description'>
 );
 
 export type AddPostMutationVariables = Exact<{
@@ -182,7 +250,7 @@ export type AddPostMutation = (
   { __typename?: 'Mutation' }
   & { AddPost: (
     { __typename?: 'Post' }
-    & ShallowPostFragment
+    & PostFragment
   ) }
 );
 
@@ -196,7 +264,7 @@ export type AddUserMutation = (
   { __typename?: 'Mutation' }
   & { AddUser: (
     { __typename?: 'User' }
-    & ShallowUserFragment
+    & UserFragment
   ) }
 );
 
@@ -210,7 +278,7 @@ export type AttemptLoginMutation = (
   { __typename?: 'Mutation' }
   & { AttemptLogin: (
     { __typename?: 'User' }
-    & ShallowUserFragment
+    & UserFragment
   ) }
 );
 
@@ -221,10 +289,10 @@ export type GetCommunityByNameQueryVariables = Exact<{
 
 export type GetCommunityByNameQuery = (
   { __typename?: 'Query' }
-  & { GetCommunityByName?: Maybe<(
+  & { GetCommunityByName: (
     { __typename?: 'Community' }
-    & ShallowCommunityFragment
-  )> }
+    & CommunityFragment
+  ) }
 );
 
 export type GetCommunitiesQueryVariables = Exact<{ [key: string]: never; }>;
@@ -234,27 +302,27 @@ export type GetCommunitiesQuery = (
   { __typename?: 'Query' }
   & { GetCommunities: Array<(
     { __typename?: 'Community' }
-    & ShallowCommunityFragment
+    & CommunityFragment
   )> }
 );
 
-export type GetCommunityWithTotalPostsByNameQueryVariables = Exact<{
+export type GetCommunityWithPostsByNameQueryVariables = Exact<{
   name: Scalars['String'];
   amount: Scalars['Float'];
   offset: Scalars['Float'];
 }>;
 
 
-export type GetCommunityWithTotalPostsByNameQuery = (
+export type GetCommunityWithPostsByNameQuery = (
   { __typename?: 'Query' }
-  & { GetCommunityByName?: Maybe<(
+  & { GetCommunityByName: (
     { __typename?: 'Community' }
     & { posts: Array<(
       { __typename?: 'Post' }
-      & TotalPostFragment
+      & PostFragment
     )> }
-    & ShallowCommunityFragment
-  )> }
+    & CommunityFragment
+  ) }
 );
 
 export type GetPostByIdQueryVariables = Exact<{
@@ -264,10 +332,33 @@ export type GetPostByIdQueryVariables = Exact<{
 
 export type GetPostByIdQuery = (
   { __typename?: 'Query' }
-  & { GetPostByID?: Maybe<(
+  & { GetPostByID: (
     { __typename?: 'Post' }
-    & TotalPostFragment
-  )> }
+    & PostFragment
+  ) }
+);
+
+export type GetPostWithCommentsByIdQueryVariables = Exact<{
+  id: Scalars['String'];
+  amount: Scalars['Float'];
+  offset: Scalars['Float'];
+}>;
+
+
+export type GetPostWithCommentsByIdQuery = (
+  { __typename?: 'Query' }
+  & { GetPostByID: (
+    { __typename?: 'Post' }
+    & { comments: Array<(
+      { __typename?: 'Comment' }
+      & { parent?: Maybe<(
+        { __typename?: 'Comment' }
+        & CommentFragment
+      )> }
+      & CommentFragment
+    )> }
+    & PostFragment
+  ) }
 );
 
 export type GetSelfQueryVariables = Exact<{ [key: string]: never; }>;
@@ -277,73 +368,78 @@ export type GetSelfQuery = (
   { __typename?: 'Query' }
   & { GetSelf?: Maybe<(
     { __typename?: 'User' }
-    & ShallowUserFragment
+    & UserFragment
   )> }
 );
 
-export type GetUserByNameWithTotalPostsQueryVariables = Exact<{
+export type GetUserByNameWithPostsQueryVariables = Exact<{
   name: Scalars['String'];
   amount: Scalars['Float'];
   offset: Scalars['Float'];
 }>;
 
 
-export type GetUserByNameWithTotalPostsQuery = (
+export type GetUserByNameWithPostsQuery = (
   { __typename?: 'Query' }
-  & { GetUserByNameWithTotalPosts?: Maybe<(
+  & { GetUserByName: (
     { __typename?: 'User' }
     & { posts: Array<(
       { __typename?: 'Post' }
-      & TotalPostFragment
+      & PostFragment
     )> }
-    & ShallowUserFragment
-  )> }
+    & UserFragment
+  ) }
 );
 
-export const ShallowPostFragmentDoc = gql`
-    fragment ShallowPost on Post {
-  id
-  title
-  content
-  upvotes
-  downvotes
-}
-    `;
-export const ShallowUserFragmentDoc = gql`
-    fragment ShallowUser on User {
+export const UserFragmentDoc = gql`
+    fragment User on User {
   id
   name
   email
   description
 }
     `;
-export const ShallowCommunityFragmentDoc = gql`
-    fragment ShallowCommunity on Community {
+export const CommentFragmentDoc = gql`
+    fragment Comment on Comment {
+  id
+  content
+  upvotes
+  downvotes
+  author {
+    ...User
+  }
+}
+    ${UserFragmentDoc}`;
+export const CommunityFragmentDoc = gql`
+    fragment Community on Community {
   id
   name
   followerCount
 }
     `;
-export const TotalPostFragmentDoc = gql`
-    fragment TotalPost on Post {
-  ...ShallowPost
+export const PostFragmentDoc = gql`
+    fragment Post on Post {
+  id
+  title
+  content
+  upvotes
+  downvotes
   author {
-    ...ShallowUser
+    ...User
   }
   community {
-    ...ShallowCommunity
+    ...Community
   }
 }
-    ${ShallowPostFragmentDoc}
-${ShallowUserFragmentDoc}
-${ShallowCommunityFragmentDoc}`;
+    ${UserFragmentDoc}
+${CommunityFragmentDoc}`;
 export const AddPostDocument = gql`
     mutation AddPost($communityID: String!, $authorID: String!, $title: String!, $content: String!) {
   AddPost(communityID: $communityID, authorID: $authorID, title: $title, content: $content) {
-    ...ShallowPost
+    ...Post
   }
 }
-    ${ShallowPostFragmentDoc}`;
+    ${PostFragmentDoc}`;
 export type AddPostMutationFn = Apollo.MutationFunction<AddPostMutation, AddPostMutationVariables>;
 export type AddPostProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
       [key in TDataName]: Apollo.MutationFunction<AddPostMutation, AddPostMutationVariables>
@@ -388,10 +484,10 @@ export type AddPostMutationOptions = Apollo.BaseMutationOptions<AddPostMutation,
 export const AddUserDocument = gql`
     mutation AddUser($name: String!, $password: String!) {
   AddUser(name: $name, password: $password) {
-    ...ShallowUser
+    ...User
   }
 }
-    ${ShallowUserFragmentDoc}`;
+    ${UserFragmentDoc}`;
 export type AddUserMutationFn = Apollo.MutationFunction<AddUserMutation, AddUserMutationVariables>;
 export type AddUserProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
       [key in TDataName]: Apollo.MutationFunction<AddUserMutation, AddUserMutationVariables>
@@ -434,10 +530,10 @@ export type AddUserMutationOptions = Apollo.BaseMutationOptions<AddUserMutation,
 export const AttemptLoginDocument = gql`
     mutation AttemptLogin($name: String!, $password: String!) {
   AttemptLogin(name: $name, password: $password) {
-    ...ShallowUser
+    ...User
   }
 }
-    ${ShallowUserFragmentDoc}`;
+    ${UserFragmentDoc}`;
 export type AttemptLoginMutationFn = Apollo.MutationFunction<AttemptLoginMutation, AttemptLoginMutationVariables>;
 export type AttemptLoginProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
       [key in TDataName]: Apollo.MutationFunction<AttemptLoginMutation, AttemptLoginMutationVariables>
@@ -480,10 +576,10 @@ export type AttemptLoginMutationOptions = Apollo.BaseMutationOptions<AttemptLogi
 export const GetCommunityByNameDocument = gql`
     query GetCommunityByName($name: String!) {
   GetCommunityByName(name: $name) {
-    ...ShallowCommunity
+    ...Community
   }
 }
-    ${ShallowCommunityFragmentDoc}`;
+    ${CommunityFragmentDoc}`;
 export type GetCommunityByNameProps<TChildProps = {}, TDataName extends string = 'data'> = {
       [key in TDataName]: ApolloReactHoc.DataValue<GetCommunityByNameQuery, GetCommunityByNameQueryVariables>
     } & TChildProps;
@@ -526,10 +622,10 @@ export type GetCommunityByNameQueryResult = Apollo.QueryResult<GetCommunityByNam
 export const GetCommunitiesDocument = gql`
     query GetCommunities {
   GetCommunities {
-    ...ShallowCommunity
+    ...Community
   }
 }
-    ${ShallowCommunityFragmentDoc}`;
+    ${CommunityFragmentDoc}`;
 export type GetCommunitiesProps<TChildProps = {}, TDataName extends string = 'data'> = {
       [key in TDataName]: ApolloReactHoc.DataValue<GetCommunitiesQuery, GetCommunitiesQueryVariables>
     } & TChildProps;
@@ -568,42 +664,42 @@ export function useGetCommunitiesLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type GetCommunitiesQueryHookResult = ReturnType<typeof useGetCommunitiesQuery>;
 export type GetCommunitiesLazyQueryHookResult = ReturnType<typeof useGetCommunitiesLazyQuery>;
 export type GetCommunitiesQueryResult = Apollo.QueryResult<GetCommunitiesQuery, GetCommunitiesQueryVariables>;
-export const GetCommunityWithTotalPostsByNameDocument = gql`
-    query GetCommunityWithTotalPostsByName($name: String!, $amount: Float!, $offset: Float!) {
+export const GetCommunityWithPostsByNameDocument = gql`
+    query GetCommunityWithPostsByName($name: String!, $amount: Float!, $offset: Float!) {
   GetCommunityByName(name: $name) {
-    ...ShallowCommunity
+    ...Community
     posts(amount: $amount, offset: $offset) {
-      ...TotalPost
+      ...Post
     }
   }
 }
-    ${ShallowCommunityFragmentDoc}
-${TotalPostFragmentDoc}`;
-export type GetCommunityWithTotalPostsByNameProps<TChildProps = {}, TDataName extends string = 'data'> = {
-      [key in TDataName]: ApolloReactHoc.DataValue<GetCommunityWithTotalPostsByNameQuery, GetCommunityWithTotalPostsByNameQueryVariables>
+    ${CommunityFragmentDoc}
+${PostFragmentDoc}`;
+export type GetCommunityWithPostsByNameProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<GetCommunityWithPostsByNameQuery, GetCommunityWithPostsByNameQueryVariables>
     } & TChildProps;
-export function withGetCommunityWithTotalPostsByName<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+export function withGetCommunityWithPostsByName<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
   TProps,
-  GetCommunityWithTotalPostsByNameQuery,
-  GetCommunityWithTotalPostsByNameQueryVariables,
-  GetCommunityWithTotalPostsByNameProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withQuery<TProps, GetCommunityWithTotalPostsByNameQuery, GetCommunityWithTotalPostsByNameQueryVariables, GetCommunityWithTotalPostsByNameProps<TChildProps, TDataName>>(GetCommunityWithTotalPostsByNameDocument, {
-      alias: 'getCommunityWithTotalPostsByName',
+  GetCommunityWithPostsByNameQuery,
+  GetCommunityWithPostsByNameQueryVariables,
+  GetCommunityWithPostsByNameProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, GetCommunityWithPostsByNameQuery, GetCommunityWithPostsByNameQueryVariables, GetCommunityWithPostsByNameProps<TChildProps, TDataName>>(GetCommunityWithPostsByNameDocument, {
+      alias: 'getCommunityWithPostsByName',
       ...operationOptions
     });
 };
 
 /**
- * __useGetCommunityWithTotalPostsByNameQuery__
+ * __useGetCommunityWithPostsByNameQuery__
  *
- * To run a query within a React component, call `useGetCommunityWithTotalPostsByNameQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCommunityWithTotalPostsByNameQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetCommunityWithPostsByNameQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommunityWithPostsByNameQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetCommunityWithTotalPostsByNameQuery({
+ * const { data, loading, error } = useGetCommunityWithPostsByNameQuery({
  *   variables: {
  *      name: // value for 'name'
  *      amount: // value for 'amount'
@@ -611,22 +707,22 @@ export function withGetCommunityWithTotalPostsByName<TProps, TChildProps = {}, T
  *   },
  * });
  */
-export function useGetCommunityWithTotalPostsByNameQuery(baseOptions?: Apollo.QueryHookOptions<GetCommunityWithTotalPostsByNameQuery, GetCommunityWithTotalPostsByNameQueryVariables>) {
-        return Apollo.useQuery<GetCommunityWithTotalPostsByNameQuery, GetCommunityWithTotalPostsByNameQueryVariables>(GetCommunityWithTotalPostsByNameDocument, baseOptions);
+export function useGetCommunityWithPostsByNameQuery(baseOptions?: Apollo.QueryHookOptions<GetCommunityWithPostsByNameQuery, GetCommunityWithPostsByNameQueryVariables>) {
+        return Apollo.useQuery<GetCommunityWithPostsByNameQuery, GetCommunityWithPostsByNameQueryVariables>(GetCommunityWithPostsByNameDocument, baseOptions);
       }
-export function useGetCommunityWithTotalPostsByNameLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCommunityWithTotalPostsByNameQuery, GetCommunityWithTotalPostsByNameQueryVariables>) {
-          return Apollo.useLazyQuery<GetCommunityWithTotalPostsByNameQuery, GetCommunityWithTotalPostsByNameQueryVariables>(GetCommunityWithTotalPostsByNameDocument, baseOptions);
+export function useGetCommunityWithPostsByNameLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCommunityWithPostsByNameQuery, GetCommunityWithPostsByNameQueryVariables>) {
+          return Apollo.useLazyQuery<GetCommunityWithPostsByNameQuery, GetCommunityWithPostsByNameQueryVariables>(GetCommunityWithPostsByNameDocument, baseOptions);
         }
-export type GetCommunityWithTotalPostsByNameQueryHookResult = ReturnType<typeof useGetCommunityWithTotalPostsByNameQuery>;
-export type GetCommunityWithTotalPostsByNameLazyQueryHookResult = ReturnType<typeof useGetCommunityWithTotalPostsByNameLazyQuery>;
-export type GetCommunityWithTotalPostsByNameQueryResult = Apollo.QueryResult<GetCommunityWithTotalPostsByNameQuery, GetCommunityWithTotalPostsByNameQueryVariables>;
+export type GetCommunityWithPostsByNameQueryHookResult = ReturnType<typeof useGetCommunityWithPostsByNameQuery>;
+export type GetCommunityWithPostsByNameLazyQueryHookResult = ReturnType<typeof useGetCommunityWithPostsByNameLazyQuery>;
+export type GetCommunityWithPostsByNameQueryResult = Apollo.QueryResult<GetCommunityWithPostsByNameQuery, GetCommunityWithPostsByNameQueryVariables>;
 export const GetPostByIdDocument = gql`
     query GetPostByID($id: String!) {
   GetPostByID(id: $id) {
-    ...TotalPost
+    ...Post
   }
 }
-    ${TotalPostFragmentDoc}`;
+    ${PostFragmentDoc}`;
 export type GetPostByIdProps<TChildProps = {}, TDataName extends string = 'data'> = {
       [key in TDataName]: ApolloReactHoc.DataValue<GetPostByIdQuery, GetPostByIdQueryVariables>
     } & TChildProps;
@@ -666,13 +762,68 @@ export function useGetPostByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type GetPostByIdQueryHookResult = ReturnType<typeof useGetPostByIdQuery>;
 export type GetPostByIdLazyQueryHookResult = ReturnType<typeof useGetPostByIdLazyQuery>;
 export type GetPostByIdQueryResult = Apollo.QueryResult<GetPostByIdQuery, GetPostByIdQueryVariables>;
+export const GetPostWithCommentsByIdDocument = gql`
+    query GetPostWithCommentsByID($id: String!, $amount: Float!, $offset: Float!) {
+  GetPostByID(id: $id) {
+    ...Post
+    comments(amount: $amount, offset: $offset) {
+      ...Comment
+      parent {
+        ...Comment
+      }
+    }
+  }
+}
+    ${PostFragmentDoc}
+${CommentFragmentDoc}`;
+export type GetPostWithCommentsByIdProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<GetPostWithCommentsByIdQuery, GetPostWithCommentsByIdQueryVariables>
+    } & TChildProps;
+export function withGetPostWithCommentsById<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetPostWithCommentsByIdQuery,
+  GetPostWithCommentsByIdQueryVariables,
+  GetPostWithCommentsByIdProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, GetPostWithCommentsByIdQuery, GetPostWithCommentsByIdQueryVariables, GetPostWithCommentsByIdProps<TChildProps, TDataName>>(GetPostWithCommentsByIdDocument, {
+      alias: 'getPostWithCommentsById',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetPostWithCommentsByIdQuery__
+ *
+ * To run a query within a React component, call `useGetPostWithCommentsByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPostWithCommentsByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPostWithCommentsByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      amount: // value for 'amount'
+ *      offset: // value for 'offset'
+ *   },
+ * });
+ */
+export function useGetPostWithCommentsByIdQuery(baseOptions?: Apollo.QueryHookOptions<GetPostWithCommentsByIdQuery, GetPostWithCommentsByIdQueryVariables>) {
+        return Apollo.useQuery<GetPostWithCommentsByIdQuery, GetPostWithCommentsByIdQueryVariables>(GetPostWithCommentsByIdDocument, baseOptions);
+      }
+export function useGetPostWithCommentsByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPostWithCommentsByIdQuery, GetPostWithCommentsByIdQueryVariables>) {
+          return Apollo.useLazyQuery<GetPostWithCommentsByIdQuery, GetPostWithCommentsByIdQueryVariables>(GetPostWithCommentsByIdDocument, baseOptions);
+        }
+export type GetPostWithCommentsByIdQueryHookResult = ReturnType<typeof useGetPostWithCommentsByIdQuery>;
+export type GetPostWithCommentsByIdLazyQueryHookResult = ReturnType<typeof useGetPostWithCommentsByIdLazyQuery>;
+export type GetPostWithCommentsByIdQueryResult = Apollo.QueryResult<GetPostWithCommentsByIdQuery, GetPostWithCommentsByIdQueryVariables>;
 export const GetSelfDocument = gql`
     query GetSelf {
   GetSelf {
-    ...ShallowUser
+    ...User
   }
 }
-    ${ShallowUserFragmentDoc}`;
+    ${UserFragmentDoc}`;
 export type GetSelfProps<TChildProps = {}, TDataName extends string = 'data'> = {
       [key in TDataName]: ApolloReactHoc.DataValue<GetSelfQuery, GetSelfQueryVariables>
     } & TChildProps;
@@ -711,42 +862,42 @@ export function useGetSelfLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ge
 export type GetSelfQueryHookResult = ReturnType<typeof useGetSelfQuery>;
 export type GetSelfLazyQueryHookResult = ReturnType<typeof useGetSelfLazyQuery>;
 export type GetSelfQueryResult = Apollo.QueryResult<GetSelfQuery, GetSelfQueryVariables>;
-export const GetUserByNameWithTotalPostsDocument = gql`
-    query GetUserByNameWithTotalPosts($name: String!, $amount: Float!, $offset: Float!) {
-  GetUserByNameWithTotalPosts(name: $name) {
-    ...ShallowUser
+export const GetUserByNameWithPostsDocument = gql`
+    query GetUserByNameWithPosts($name: String!, $amount: Float!, $offset: Float!) {
+  GetUserByName(name: $name) {
+    ...User
     posts(amount: $amount, offset: $offset) {
-      ...TotalPost
+      ...Post
     }
   }
 }
-    ${ShallowUserFragmentDoc}
-${TotalPostFragmentDoc}`;
-export type GetUserByNameWithTotalPostsProps<TChildProps = {}, TDataName extends string = 'data'> = {
-      [key in TDataName]: ApolloReactHoc.DataValue<GetUserByNameWithTotalPostsQuery, GetUserByNameWithTotalPostsQueryVariables>
+    ${UserFragmentDoc}
+${PostFragmentDoc}`;
+export type GetUserByNameWithPostsProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<GetUserByNameWithPostsQuery, GetUserByNameWithPostsQueryVariables>
     } & TChildProps;
-export function withGetUserByNameWithTotalPosts<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+export function withGetUserByNameWithPosts<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
   TProps,
-  GetUserByNameWithTotalPostsQuery,
-  GetUserByNameWithTotalPostsQueryVariables,
-  GetUserByNameWithTotalPostsProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withQuery<TProps, GetUserByNameWithTotalPostsQuery, GetUserByNameWithTotalPostsQueryVariables, GetUserByNameWithTotalPostsProps<TChildProps, TDataName>>(GetUserByNameWithTotalPostsDocument, {
-      alias: 'getUserByNameWithTotalPosts',
+  GetUserByNameWithPostsQuery,
+  GetUserByNameWithPostsQueryVariables,
+  GetUserByNameWithPostsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, GetUserByNameWithPostsQuery, GetUserByNameWithPostsQueryVariables, GetUserByNameWithPostsProps<TChildProps, TDataName>>(GetUserByNameWithPostsDocument, {
+      alias: 'getUserByNameWithPosts',
       ...operationOptions
     });
 };
 
 /**
- * __useGetUserByNameWithTotalPostsQuery__
+ * __useGetUserByNameWithPostsQuery__
  *
- * To run a query within a React component, call `useGetUserByNameWithTotalPostsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetUserByNameWithTotalPostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetUserByNameWithPostsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserByNameWithPostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetUserByNameWithTotalPostsQuery({
+ * const { data, loading, error } = useGetUserByNameWithPostsQuery({
  *   variables: {
  *      name: // value for 'name'
  *      amount: // value for 'amount'
@@ -754,12 +905,12 @@ export function withGetUserByNameWithTotalPosts<TProps, TChildProps = {}, TDataN
  *   },
  * });
  */
-export function useGetUserByNameWithTotalPostsQuery(baseOptions?: Apollo.QueryHookOptions<GetUserByNameWithTotalPostsQuery, GetUserByNameWithTotalPostsQueryVariables>) {
-        return Apollo.useQuery<GetUserByNameWithTotalPostsQuery, GetUserByNameWithTotalPostsQueryVariables>(GetUserByNameWithTotalPostsDocument, baseOptions);
+export function useGetUserByNameWithPostsQuery(baseOptions?: Apollo.QueryHookOptions<GetUserByNameWithPostsQuery, GetUserByNameWithPostsQueryVariables>) {
+        return Apollo.useQuery<GetUserByNameWithPostsQuery, GetUserByNameWithPostsQueryVariables>(GetUserByNameWithPostsDocument, baseOptions);
       }
-export function useGetUserByNameWithTotalPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserByNameWithTotalPostsQuery, GetUserByNameWithTotalPostsQueryVariables>) {
-          return Apollo.useLazyQuery<GetUserByNameWithTotalPostsQuery, GetUserByNameWithTotalPostsQueryVariables>(GetUserByNameWithTotalPostsDocument, baseOptions);
+export function useGetUserByNameWithPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserByNameWithPostsQuery, GetUserByNameWithPostsQueryVariables>) {
+          return Apollo.useLazyQuery<GetUserByNameWithPostsQuery, GetUserByNameWithPostsQueryVariables>(GetUserByNameWithPostsDocument, baseOptions);
         }
-export type GetUserByNameWithTotalPostsQueryHookResult = ReturnType<typeof useGetUserByNameWithTotalPostsQuery>;
-export type GetUserByNameWithTotalPostsLazyQueryHookResult = ReturnType<typeof useGetUserByNameWithTotalPostsLazyQuery>;
-export type GetUserByNameWithTotalPostsQueryResult = Apollo.QueryResult<GetUserByNameWithTotalPostsQuery, GetUserByNameWithTotalPostsQueryVariables>;
+export type GetUserByNameWithPostsQueryHookResult = ReturnType<typeof useGetUserByNameWithPostsQuery>;
+export type GetUserByNameWithPostsLazyQueryHookResult = ReturnType<typeof useGetUserByNameWithPostsLazyQuery>;
+export type GetUserByNameWithPostsQueryResult = Apollo.QueryResult<GetUserByNameWithPostsQuery, GetUserByNameWithPostsQueryVariables>;

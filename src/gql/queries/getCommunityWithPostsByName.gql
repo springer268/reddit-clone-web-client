@@ -1,0 +1,8 @@
+query GetCommunityWithPostsByName($name: String!, $amount: Float!, $offset: Float!) {
+	GetCommunityByName(name: $name) {
+		...Community
+		posts(amount: $amount, offset: $offset) {
+			...Post
+		}
+	}
+}

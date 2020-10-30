@@ -1,5 +1,5 @@
 mutation AddPost($communityID: String!, $authorID: String!, $title: String!, $content: String!) {
 	AddPost(communityID: $communityID, authorID: $authorID, title: $title, content: $content) {
-		...ShallowPost
+		...Post
 	}
 }
