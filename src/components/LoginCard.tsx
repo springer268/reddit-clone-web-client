@@ -1,5 +1,5 @@
 import Router from 'next/router'
-import { Card, Input, ErrorMessage, Button, CardWrapper, Header } from './ui'
+import { Card, Input, ErrorMessage, Button, CardWrapper, Header } from 'ui'
 import { Formik } from 'formik'
 import { useAttemptLoginMutation } from 'gql'
 import { useContext } from 'react'

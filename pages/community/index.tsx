@@ -1,7 +1,7 @@
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { Layout } from 'components'
-import { Header } from 'components/ui'
+import { Header } from 'ui'
 import { useIsAuth, useSelf } from 'hooks'
 import { useGetCommunitiesQuery } from 'gql'
 
@@ -16,10 +16,10 @@ const CommunitiesPage: NextPage = () => {
 
 	return (
 		<Layout>
-			<Header>Hello</Header>
+			<Header>Communities</Header>
 			{communities.map(community => (
 				<Link href={`/community/${community.name}`} key={community.id}>
-					<div>{community.name}</div>
+					<div style={{ cursor: 'pointer' }}>{community.name}</div>
 				</Link>
 			))}
 		</Layout>

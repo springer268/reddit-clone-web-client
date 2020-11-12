@@ -86,7 +86,7 @@ export type User = {
   description: Scalars['String'];
   posts: Array<Post>;
   comments: Array<Comment>;
-  comunities: Array<Community>;
+  communities: Array<Community>;
 };
 
 
@@ -102,7 +102,7 @@ export type UserCommentsArgs = {
 };
 
 
-export type UserComunitiesArgs = {
+export type UserCommunitiesArgs = {
   offset?: Maybe<Scalars['Float']>;
   amount: Scalars['Float'];
 };
@@ -142,6 +142,7 @@ export type CommunityPostsArgs = {
 export type Comment = {
   __typename?: 'Comment';
   id: Scalars['String'];
+  path: Scalars['String'];
   content: Scalars['String'];
   upvotes: Scalars['Int'];
   downvotes: Scalars['Int'];
@@ -282,6 +283,35 @@ export type AttemptLoginMutation = (
   ) }
 );
 
+export type GetCommunitiesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCommunitiesQuery = (
+  { __typename?: 'Query' }
+  & { GetCommunities: Array<(
+    { __typename?: 'Community' }
+    & CommunityFragment
+  )> }
+);
+
+export type GetCommunitiesByUserIdQueryVariables = Exact<{
+  name: Scalars['String'];
+  amount: Scalars['Float'];
+  offset: Scalars['Float'];
+}>;
+
+
+export type GetCommunitiesByUserIdQuery = (
+  { __typename?: 'Query' }
+  & { GetUserByName: (
+    { __typename?: 'User' }
+    & { communities: Array<(
+      { __typename?: 'Community' }
+      & CommunityFragment
+    )> }
+  ) }
+);
+
 export type GetCommunityByNameQueryVariables = Exact<{
   name: Scalars['String'];
 }>;
@@ -293,17 +323,6 @@ export type GetCommunityByNameQuery = (
     { __typename?: 'Community' }
     & CommunityFragment
   ) }
-);
-
-export type GetCommunitiesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetCommunitiesQuery = (
-  { __typename?: 'Query' }
-  & { GetCommunities: Array<(
-    { __typename?: 'Community' }
-    & CommunityFragment
-  )> }
 );
 
 export type GetCommunityWithPostsByNameQueryVariables = Exact<{
@@ -351,10 +370,6 @@ export type GetPostWithCommentsByIdQuery = (
     { __typename?: 'Post' }
     & { comments: Array<(
       { __typename?: 'Comment' }
-      & { parent?: Maybe<(
-        { __typename?: 'Comment' }
-        & CommentFragment
-      )> }
       & CommentFragment
     )> }
     & PostFragment
@@ -573,6 +588,101 @@ export function useAttemptLoginMutation(baseOptions?: Apollo.MutationHookOptions
 export type AttemptLoginMutationHookResult = ReturnType<typeof useAttemptLoginMutation>;
 export type AttemptLoginMutationResult = Apollo.MutationResult<AttemptLoginMutation>;
 export type AttemptLoginMutationOptions = Apollo.BaseMutationOptions<AttemptLoginMutation, AttemptLoginMutationVariables>;
+export const GetCommunitiesDocument = gql`
+    query GetCommunities {
+  GetCommunities {
+    ...Community
+  }
+}
+    ${CommunityFragmentDoc}`;
+export type GetCommunitiesProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<GetCommunitiesQuery, GetCommunitiesQueryVariables>
+    } & TChildProps;
+export function withGetCommunities<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetCommunitiesQuery,
+  GetCommunitiesQueryVariables,
+  GetCommunitiesProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, GetCommunitiesQuery, GetCommunitiesQueryVariables, GetCommunitiesProps<TChildProps, TDataName>>(GetCommunitiesDocument, {
+      alias: 'getCommunities',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetCommunitiesQuery__
+ *
+ * To run a query within a React component, call `useGetCommunitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommunitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCommunitiesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCommunitiesQuery(baseOptions?: Apollo.QueryHookOptions<GetCommunitiesQuery, GetCommunitiesQueryVariables>) {
+        return Apollo.useQuery<GetCommunitiesQuery, GetCommunitiesQueryVariables>(GetCommunitiesDocument, baseOptions);
+      }
+export function useGetCommunitiesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCommunitiesQuery, GetCommunitiesQueryVariables>) {
+          return Apollo.useLazyQuery<GetCommunitiesQuery, GetCommunitiesQueryVariables>(GetCommunitiesDocument, baseOptions);
+        }
+export type GetCommunitiesQueryHookResult = ReturnType<typeof useGetCommunitiesQuery>;
+export type GetCommunitiesLazyQueryHookResult = ReturnType<typeof useGetCommunitiesLazyQuery>;
+export type GetCommunitiesQueryResult = Apollo.QueryResult<GetCommunitiesQuery, GetCommunitiesQueryVariables>;
+export const GetCommunitiesByUserIdDocument = gql`
+    query GetCommunitiesByUserID($name: String!, $amount: Float!, $offset: Float!) {
+  GetUserByName(name: $name) {
+    communities(amount: $amount, offset: $offset) {
+      ...Community
+    }
+  }
+}
+    ${CommunityFragmentDoc}`;
+export type GetCommunitiesByUserIdProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<GetCommunitiesByUserIdQuery, GetCommunitiesByUserIdQueryVariables>
+    } & TChildProps;
+export function withGetCommunitiesByUserId<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetCommunitiesByUserIdQuery,
+  GetCommunitiesByUserIdQueryVariables,
+  GetCommunitiesByUserIdProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, GetCommunitiesByUserIdQuery, GetCommunitiesByUserIdQueryVariables, GetCommunitiesByUserIdProps<TChildProps, TDataName>>(GetCommunitiesByUserIdDocument, {
+      alias: 'getCommunitiesByUserId',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetCommunitiesByUserIdQuery__
+ *
+ * To run a query within a React component, call `useGetCommunitiesByUserIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCommunitiesByUserIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCommunitiesByUserIdQuery({
+ *   variables: {
+ *      name: // value for 'name'
+ *      amount: // value for 'amount'
+ *      offset: // value for 'offset'
+ *   },
+ * });
+ */
+export function useGetCommunitiesByUserIdQuery(baseOptions?: Apollo.QueryHookOptions<GetCommunitiesByUserIdQuery, GetCommunitiesByUserIdQueryVariables>) {
+        return Apollo.useQuery<GetCommunitiesByUserIdQuery, GetCommunitiesByUserIdQueryVariables>(GetCommunitiesByUserIdDocument, baseOptions);
+      }
+export function useGetCommunitiesByUserIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCommunitiesByUserIdQuery, GetCommunitiesByUserIdQueryVariables>) {
+          return Apollo.useLazyQuery<GetCommunitiesByUserIdQuery, GetCommunitiesByUserIdQueryVariables>(GetCommunitiesByUserIdDocument, baseOptions);
+        }
+export type GetCommunitiesByUserIdQueryHookResult = ReturnType<typeof useGetCommunitiesByUserIdQuery>;
+export type GetCommunitiesByUserIdLazyQueryHookResult = ReturnType<typeof useGetCommunitiesByUserIdLazyQuery>;
+export type GetCommunitiesByUserIdQueryResult = Apollo.QueryResult<GetCommunitiesByUserIdQuery, GetCommunitiesByUserIdQueryVariables>;
 export const GetCommunityByNameDocument = gql`
     query GetCommunityByName($name: String!) {
   GetCommunityByName(name: $name) {
@@ -619,51 +729,6 @@ export function useGetCommunityByNameLazyQuery(baseOptions?: Apollo.LazyQueryHoo
 export type GetCommunityByNameQueryHookResult = ReturnType<typeof useGetCommunityByNameQuery>;
 export type GetCommunityByNameLazyQueryHookResult = ReturnType<typeof useGetCommunityByNameLazyQuery>;
 export type GetCommunityByNameQueryResult = Apollo.QueryResult<GetCommunityByNameQuery, GetCommunityByNameQueryVariables>;
-export const GetCommunitiesDocument = gql`
-    query GetCommunities {
-  GetCommunities {
-    ...Community
-  }
-}
-    ${CommunityFragmentDoc}`;
-export type GetCommunitiesProps<TChildProps = {}, TDataName extends string = 'data'> = {
-      [key in TDataName]: ApolloReactHoc.DataValue<GetCommunitiesQuery, GetCommunitiesQueryVariables>
-    } & TChildProps;
-export function withGetCommunities<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  GetCommunitiesQuery,
-  GetCommunitiesQueryVariables,
-  GetCommunitiesProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withQuery<TProps, GetCommunitiesQuery, GetCommunitiesQueryVariables, GetCommunitiesProps<TChildProps, TDataName>>(GetCommunitiesDocument, {
-      alias: 'getCommunities',
-      ...operationOptions
-    });
-};
-
-/**
- * __useGetCommunitiesQuery__
- *
- * To run a query within a React component, call `useGetCommunitiesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCommunitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetCommunitiesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetCommunitiesQuery(baseOptions?: Apollo.QueryHookOptions<GetCommunitiesQuery, GetCommunitiesQueryVariables>) {
-        return Apollo.useQuery<GetCommunitiesQuery, GetCommunitiesQueryVariables>(GetCommunitiesDocument, baseOptions);
-      }
-export function useGetCommunitiesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCommunitiesQuery, GetCommunitiesQueryVariables>) {
-          return Apollo.useLazyQuery<GetCommunitiesQuery, GetCommunitiesQueryVariables>(GetCommunitiesDocument, baseOptions);
-        }
-export type GetCommunitiesQueryHookResult = ReturnType<typeof useGetCommunitiesQuery>;
-export type GetCommunitiesLazyQueryHookResult = ReturnType<typeof useGetCommunitiesLazyQuery>;
-export type GetCommunitiesQueryResult = Apollo.QueryResult<GetCommunitiesQuery, GetCommunitiesQueryVariables>;
 export const GetCommunityWithPostsByNameDocument = gql`
     query GetCommunityWithPostsByName($name: String!, $amount: Float!, $offset: Float!) {
   GetCommunityByName(name: $name) {
@@ -768,9 +833,6 @@ export const GetPostWithCommentsByIdDocument = gql`
     ...Post
     comments(amount: $amount, offset: $offset) {
       ...Comment
-      parent {
-        ...Comment
-      }
     }
   }
 }

@@ -1,7 +1,5 @@
-import { useEffect } from 'react'
 import { NextPage } from 'next'
 import { Layout, SignupCard } from 'components'
-import Router from 'next/router'
 
 const SignupPage: NextPage = () => {
 	return (

@@ -1,7 +1,7 @@
 import { useSelf } from 'hooks'
 import Link from 'next/link'
 import styled from 'styled-components'
-import { theme } from './ui/theme'
+import { theme } from 'ui'
 
 const NavUI = styled.nav`
 	position: sticky;

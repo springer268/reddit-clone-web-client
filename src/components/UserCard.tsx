@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { User } from 'models'
-import { Card, Header } from './ui'
+import { Card, Header } from 'ui'
 
 const Style = styled.div`
 	padding: 0 0 15px 0;

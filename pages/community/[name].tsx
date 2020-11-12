@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { NextPage } from 'next'
 import { Layout, AddPostCard, PostCard } from 'components'
-import { Header } from 'components/ui'
+import { Header } from 'ui'
 import { useIsAuth, useSelf } from 'hooks'
 import { useGetCommunityWithPostsByNameQuery } from 'gql'
 import { useRouter } from 'next/router'
@@ -9,17 +9,17 @@ import InfiniteScroll from 'react-infinite-scroller'
 
 interface InitialProps {}
 
-const AMOUNT = 5
+const FETCH_AMOUNT = 5
 
 const CommunityPage: NextPage<InitialProps> = () => {
 	const router = useRouter()
 	const { self } = useSelf()
 	const [areMorePosts, setAreMorePosts] = useState(true)
-	const offset = useRef(AMOUNT)
+	const offset = useRef(FETCH_AMOUNT)
 	useIsAuth(self)
 
 	const { data, fetchMore, loading } = useGetCommunityWithPostsByNameQuery({
-		variables: { name: router.query.name as string, amount: AMOUNT, offset: 0 }
+		variables: { name: router.query.name as string, amount: FETCH_AMOUNT, offset: 0 }
 	})
 
 	if (!self || loading) return <Layout></Layout>
@@ -42,7 +42,7 @@ const CommunityPage: NextPage<InitialProps> = () => {
 					hasMore={areMorePosts}
 					loadMore={async () => {
 						await fetchMore({
-							variables: { amount: AMOUNT, offset: offset.current },
+							variables: { amount: FETCH_AMOUNT, offset: offset.current },
 							//@ts-ignore
 							updateQuery: (prevResult, { fetchMoreResult }) => {
 								if (
@@ -59,7 +59,7 @@ const CommunityPage: NextPage<InitialProps> = () => {
 									...fetchMoreResult.GetCommunityByName.posts
 								]
 
-								offset.current += AMOUNT
+								offset.current += FETCH_AMOUNT
 
 								return fetchMoreResult
 							}

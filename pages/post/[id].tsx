@@ -1,6 +1,6 @@
 import { NextPage } from 'next'
 import { CommentSection, Layout } from 'components'
-import { Header } from 'components/ui'
+import { Header } from 'ui'
 import { useIsAuth, useSelf } from 'hooks'
 import { useRouter } from 'next/router'
 import { useGetPostWithCommentsByIdQuery } from 'gql'

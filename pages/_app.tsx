@@ -5,7 +5,7 @@ import { GlobalStyles, SelfGetter } from 'utility'
 import { SelfContextProvider } from 'context'
 import { backendApolloClient } from 'apollo'
 
-const App = ({ Component, pageProps }: AppProps) => {
+const App: React.FC<AppProps> = ({ Component, pageProps }) => {
 	return (
 		<ApolloProvider client={backendApolloClient}>
 			<SelfContextProvider>

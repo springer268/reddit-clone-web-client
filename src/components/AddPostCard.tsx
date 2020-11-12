@@ -1,6 +1,6 @@
 import Router from 'next/router'
 import { Formik } from 'formik'
-import { Card, Header, CardWrapper, Input, Button, ErrorMessage } from './ui'
+import { Card, Header, CardWrapper, Input, Button, ErrorMessage } from 'ui'
 import { Community, User } from 'models'
 import { useAddPostMutation } from 'gql'
 

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useRef } from 'react'
 import { NextPage } from 'next'
 import { Layout, PostCard } from 'components'
-import { Header } from 'components/ui'
+import { Header } from 'ui'
 import { useIsAuth, useSelf } from 'hooks'
 import { useGetUserByNameWithPostsQuery } from 'gql'
 import InfiniteScroll from 'react-infinite-scroller'
@@ -34,7 +34,7 @@ const UserPage: NextPage = () => {
 
 	return (
 		<Layout>
-			<Header>{self.name}</Header>
+			<Header>{user.name}</Header>
 			<InfiniteScroll
 				pageStart={0}
 				hasMore={hasMore}

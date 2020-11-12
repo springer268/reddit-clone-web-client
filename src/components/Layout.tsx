@@ -1,5 +1,5 @@
 import { Navbar, Footer } from '.'
-import { Wrapper } from './ui'
+import { Wrapper } from 'ui'
 import styled from 'styled-components'
 
 const PageContainer = styled.div`

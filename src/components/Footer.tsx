@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Card } from './ui'
+import { Card } from 'ui'
 
 const FooterUI = styled(Card)`
 	margin: 0;

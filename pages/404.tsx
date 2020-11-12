@@ -1,3 +1,12 @@
-export default function yikes() {
-	return <h1>404, Sad!</h1>
+import { Layout } from 'components'
+import { Header } from 'ui'
+
+const FourOFourPage = () => {
+	return (
+		<Layout>
+			<Header>Page does not exist!</Header>
+		</Layout>
+	)
 }
+
+export default FourOFourPage

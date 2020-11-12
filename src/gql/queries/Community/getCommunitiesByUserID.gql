@@ -1,0 +1,7 @@
+query GetCommunitiesByUserID($name: String!, $amount: Float!, $offset: Float!) {
+	GetUserByName(name: $name) {
+		communities(amount: $amount, offset: $offset) {
+			...Community
+		}
+	}
+}

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { NextPage } from 'next'
 import { Layout } from 'components'
-import { Header } from 'components/ui'
+import { Header } from 'ui'
 import { useSelf } from 'hooks'
 
 const LogoutPage: NextPage = () => {
@@ -9,7 +9,7 @@ const LogoutPage: NextPage = () => {
 
 	useEffect(() => {
 		if (document.cookie.length > 0) {
-			document.cookie.split(';').forEach(function (c) {
+			document.cookie.split(';').forEach(c => {
 				document.cookie = c
 					.replace(/^ +/, '')
 					.replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/')
